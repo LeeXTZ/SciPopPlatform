@@ -1,0 +1,183 @@
+<template>
+  <view>
+    <view class="userinfo-container">
+      <button class="getUserinfo-button" wx:if="{{!hasUserInfo}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 请点击登录 </button>
+      <block wx:else>
+        <ui-blur height="300" url="{{ userInfo.avatarUrl }}">
+          <view class="top_content">
+            <view>
+              <image src="{{ userInfo.avatarUrl }}" mode='aspectFill' />
+            </view>
+            <view class="name">
+              {{userInfo.nickName}} <ui-icon type="write" size="16" color="#fff"></ui-icon>
+            </view>
+            <view class="user-motto">
+              <view>
+                这个人很懒，什么都没留下。
+              </view>
+            </view>
+          </view>
+        </ui-blur>
+      </block>
+    </view>
+
+    <ui-row-list border-indent >
+        <ui-row height="50" wx:for="{{ items }}" wx:key="key" >
+          <ui-col width="40" vertical-align="middle" align="center">
+              <ui-icon type="comment" size="20" color="#545454"></ui-icon>
+          </ui-col>
+          <ui-col class="text" vertical-align="middle">
+              {{ item }}
+          </ui-col>
+          <ui-col width="25" vertical-align="middle">
+              <ui-icon type="arrow-right"></ui-icon>
+          </ui-col>
+      </ui-row>
+    </ui-row-list>
+
+</template>
+
+<script>
+const app = getApp();
+
+let items = ["账号信息", "收藏", "设置", "关于"];
+
+export default {
+  config: {
+    navigationBarTitleText: "我的"
+  },
+  data: {
+    // motto: 'Hello World',
+    userInfo: {},
+    hasUserInfo: false,
+    canIUse: wx.canIUse("button.open-type.getUserInfo"),
+
+    // NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
+    // scrollTop: 0,
+    items: items,
+    imgHeight: parseInt(wx.WIN_WIDTH / 1125 * 628),
+    customStyle: {
+      "background-color": "#eee",
+      height: "46px",
+      "line-height": "46px"
+    }
+  },
+  // onPageScroll(e) {
+  //   this.setData({
+  //     scrollTop: e.scrollTop
+  //   });
+  // },
+  //事件处理函数
+  bindViewTap: function() {
+    wx.navigateTo({
+      url: "../logs/logs"
+    });
+  },
+  onLoad: function() {
+    if (app.globalData.userInfo) {
+      this.setData({
+        userInfo: app.globalData.userInfo,
+        hasUserInfo: true
+      });
+    } else if (this.data.canIUse) {
+      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+      // 所以此处加入 callback 以防止这种情况
+      app.userInfoReadyCallback = res => {
+        this.setData({
+          userInfo: res.userInfo,
+          hasUserInfo: true
+        });
+      };
+    } else {
+      // 在没有 open-type=getUserInfo 版本的兼容处理
+      wx.getUserInfo({
+        success: res => {
+          app.globalData.userInfo = res.userInfo;
+          this.setData({
+            userInfo: res.userInfo,
+            hasUserInfo: true
+          });
+        }
+      });
+    }
+  },
+  getUserInfo: function(e) {
+    console.log(e);
+    if (e.detail.hasOwnProperty("userInfo")) {
+      app.globalData.userInfo = e.detail.userInfo;
+      this.setData({
+        userInfo: e.detail.userInfo,
+        hasUserInfo: true
+      });
+    } else {
+      // app.globalData.userInfo = e.detail.userInfo;
+      this.setData({
+        userInfo: {},
+        hasUserInfo: false
+      });
+    }
+  }
+};
+</script>
+
+<style lang="less">
+.userinfo-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.getUserinfo-button{
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  width: 375rpx;
+}
+
+// .userinfo-avatar {
+//   width: 128rpx;
+//   height: 128rpx;
+//   margin: 20rpx;
+//   border-radius: 50%;
+// }
+
+.userinfo-nickname {
+  color: #aaa;
+}
+
+.userinfo-container{
+  .top_content{
+    width: 100%;
+    // height: 100%;
+    position: absolute;
+    bottom:20px;
+    view{
+      .mix-flex-center();
+      color: #fff;
+      font-size: 16px;
+      image{
+        height: 120rpx;
+        width: 120rpx;
+        border-radius: 50%;
+        border: 2px solid #fff;
+      }
+      .ui-icon{
+        margin-left: 10px;
+      }
+      &.name{
+        padding: 20px 0;
+      }
+      .ui-view{
+        display: inline-block;
+        padding: 5px;
+        border-radius: 25px;
+        border: 1px solid #fff;
+      }
+      &.card{
+        .ui-view{
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+</style>

@@ -1,0 +1,122 @@
+<template>
+  <view>
+    <map id="detailMap" subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4"
+      markers="{{markers}}" style="width:100%;height:300px;"
+      longitude="{{poi.location.lng}}" latitude="{{poi.location.lat}}"
+      scale='17' show-location>
+    </map>
+
+<!-- 场馆信息待完善 -->
+    <ui-accordion bindchange="slide" header-height="50">
+      <view slot="header">
+        <ui-row height="50" border-bottom class="title">
+          <ui-col vertical-align="middle" align="left" space-left="10">
+            场馆介绍
+          </ui-col>
+          <ui-col vertical-align="middle" align="center" width="30"></ui-col>
+        </ui-row>
+      </view>
+      <view slot="content">
+        <ui-row height="40" class='content'>
+          <ui-col vertical-align="middle" align="left" space-left="10">{{ item2.title }}</ui-col>
+          <ui-col vertical-align="middle" align="center" width="50">
+            <ui-icon name="{{ item.state==='abnormal' ? 'error':'success' }}" size="16" color="{{ item.state==='abnormal' ? '#F5AC29':'#2AA744' }}"></ui-icon>
+          </ui-col>
+        </ui-row>
+      </view>
+    </ui-accordion>
+
+    <ui-accordion bindchange="slide" header-height="50">
+      <view slot="header">
+        <ui-row height="50" border-bottom class="title">
+          <ui-col vertical-align="middle" align="left" space-left="10">
+            联系地址
+          </ui-col>
+          <ui-col vertical-align="middle" align="center" width="30"></ui-col>
+        </ui-row>
+      </view>
+      <view slot="content">
+        <ui-row height="40" class='content'>
+          <ui-col vertical-align="middle" align="left" space-left="10">{{ item2.title }}</ui-col>
+          <ui-col vertical-align="middle" align="center" width="50">
+            <ui-icon name="{{ item.state==='abnormal' ? 'error':'success' }}" size="16" color="{{ item.state==='abnormal' ? '#F5AC29':'#2AA744' }}"></ui-icon>
+          </ui-col>
+        </ui-row>
+      </view>
+    </ui-accordion>
+    
+    <ui-accordion bindchange="slide" header-height="50">
+      <view slot="header">
+        <ui-row height="50" border-bottom class="title">
+          <ui-col vertical-align="middle" align="left" space-left="10">
+            参观指南
+          </ui-col>
+          <ui-col vertical-align="middle" align="center" width="30"></ui-col>
+        </ui-row>
+      </view>
+      <view slot="content">
+        <ui-row height="40" class='content'>
+          <ui-col vertical-align="middle" align="left" space-left="10">{{ item2.title }}</ui-col>
+          <ui-col vertical-align="middle" align="center" width="50">
+            <ui-icon name="{{ item.state==='abnormal' ? 'error':'success' }}" size="16" color="{{ item.state==='abnormal' ? '#F5AC29':'#2AA744' }}"></ui-icon>
+          </ui-col>
+        </ui-row>
+      </view>
+    </ui-accordion>
+    
+    <ui-accordion bindchange="slide" header-height="50">
+      <view slot="header">
+        <ui-row height="50" border-bottom class="title">
+          <ui-col vertical-align="middle" align="left" space-left="10">
+            展厅列表
+          </ui-col>
+          <ui-col vertical-align="middle" align="center" width="30"></ui-col>
+        </ui-row>
+      </view>
+      <view slot="content">
+        <ui-row height="40" class='content'>
+          <ui-col vertical-align="middle" align="left" space-left="10">{{ item2.title }}</ui-col>
+          <ui-col vertical-align="middle" align="center" width="50">
+            <ui-icon name="{{ item.state==='abnormal' ? 'error':'success' }}" size="16" color="{{ item.state==='abnormal' ? '#F5AC29':'#2AA744' }}"></ui-icon>
+          </ui-col>
+        </ui-row>
+      </view>
+    </ui-accordion>
+
+    <text>{{poi.title}}</text>
+    <text>{{poi.address}}</text>
+    <text>{{poi.category}}</text>
+  </view>
+</template>
+
+<script>
+export default {
+  config: {
+    navigationBarTitleText: ''
+  },
+  data: {
+    accordion:{
+
+    }
+  },
+  onLoad: function (options) {
+    console.log(options.poi);
+    let poi = JSON.parse(options.poi);
+    this.setData({
+      poi: poi,
+      markers:[{
+              title: poi.title,
+              id: poi.id,
+              latitude: poi.location.lat,
+              longitude: poi.location.lng,
+              iconPath: "../../static/images/location-doodle-48-blue.png",
+              width: 30,
+              height: 30
+            }]
+    });
+  }
+}
+</script>
+
+<style lang="less">
+</style>

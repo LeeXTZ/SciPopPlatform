@@ -1,0 +1,8 @@
+ui-segment {
+  display: inline-block;
+  width: 100%;
+}
+.ui-segment {
+  display: flex;
+  justify-content: center;
+}

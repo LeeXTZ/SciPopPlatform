@@ -1,0 +1,3 @@
+<view class="ui-segment-item {{ isFirst ? 'ui-segment-item-first' : '' }} {{ isLast ? 'ui-segment-item-last' : '' }} {{ active ? 'active' : '' }}" style="{{ selfStyle }}" bindtap="handleChange">
+  <slot></slot>
+</view>

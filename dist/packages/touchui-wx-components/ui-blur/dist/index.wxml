@@ -1,0 +1,6 @@
+<view class="ui-blur" style="{{ selfStyle }}">
+  <view class="{{ blurClass }}" style="{{ blurStyle }}"></view>
+  <view class="ui-blur-content">
+    <slot></slot>
+  </view>
+</view>

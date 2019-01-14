@@ -1,0 +1,28 @@
+<!-- newsArray news:newsImageSrc title content switchToNewsDetails -->
+<view>
+  <view class="newslist">
+    <view id="{{index}}" bindtap="switchToNewsDetails" wx:for="{{newsArray}}" wx:key="key" hover-class="touchui-hover" class="ui-row ui-row-border-bottom" style="height:80px;">
+      <view class="ui-col ui-col-align-center align-center valign-middle" style="flex:0 0 80px;">
+        <view class="ui-col-content align-center valign-middle">
+          <image src="{{item.newsImageSrc}}" width="50" height="50" />
+        </view>
+      </view>
+      <view class="text ui-col ui-col-align-left align-left valign-middle" style="padding-left: 10px; padding-right: 10px;">
+        <view class="ui-col-content align-left valign-middle">
+          <view style="width: 100%;">
+            <view class="ui-row" style="height:30px;">
+              <view class="ui-col ui-col-align-left align-left valign-middle" style="">
+                <view class="ui-col-content align-left valign-middle">
+                  <text>{{item.title}}</text>
+                </view>
+              </view>
+            </view>
+            <view>{{item.content}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+
+</view>

@@ -1,0 +1,67 @@
+/* 1像素解决方案 */
+/*
+ * 清除1px
+ */
+/*
+ * 清除浮动
+ */
+/*
+ * mobile
+ */
+/*
+ * 1px
+ */
+/*
+ * text
+ */
+/* 垂直居中 */
+/* 水平居中 */
+/* 水平垂直居中 */
+/* 超出部分出省略号 */
+/* 多行文本超出部分省略号 */
+.userinfo-container {
+  display: flex;
+  flex-direction: column;
+}
+.getUserinfo-button {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  width: 375rpx;
+}
+.userinfo-nickname {
+  color: #aaa;
+}
+.userinfo-container .top_content {
+  width: 100%;
+  position: absolute;
+  bottom: 20px;
+}
+.userinfo-container .top_content view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+}
+.userinfo-container .top_content view image {
+  height: 120rpx;
+  width: 120rpx;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.userinfo-container .top_content view .ui-icon {
+  margin-left: 10px;
+}
+.userinfo-container .top_content view.name {
+  padding: 20px 0;
+}
+.userinfo-container .top_content view .ui-view {
+  display: inline-block;
+  padding: 5px;
+  border-radius: 25px;
+  border: 1px solid #fff;
+}
+.userinfo-container .top_content view.card .ui-view {
+  font-size: 14px;
+}

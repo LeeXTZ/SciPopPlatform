@@ -1,0 +1,42 @@
+<view>
+  <map id="myMap" subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" markers="{{markers}}" bindmarkertap="switchToSiteDetails" style="width:100%;height:300px;" longitude="{{currLocation.longitude}}" latitude="{{currLocation.latitude}}" scale="13" show-location>
+  </map>
+
+  <view style="height:10rpx"></view>
+  <ui-segment bindchange="sgmChange" item-style="{{itemStyle}}" active-item-style="{{activeItemStyle}}" _pid="{{_pid}}">
+    <ui-segment-item _pid="{{_pid}}">
+      展教联盟
+    </ui-segment-item>
+    <ui-segment-item _pid="{{_pid}}">
+      特色场馆
+    </ui-segment-item>
+    <ui-segment-item _pid="{{_pid}}">
+      社区科普大学
+    </ui-segment-item>
+  </ui-segment>
+  <view style="height:10rpx"></view>
+
+  <view class="description">
+    <view id="{{item.id}}" bindtap="switchToSiteDetails" wx:for="{{pois}}" wx:key="key" hover-class="touchui-hover" class="ui-row ui-row-border-bottom" style="height:80px;">
+      <view class="ui-col ui-col-align-center align-center valign-middle" style="flex:0 0 80px;">
+        <view class="ui-col-content align-center valign-middle">
+          <image src="{{descriptionImageSrc}}" width="50" height="50" />
+        </view>
+      </view>
+      <view class="text ui-col ui-col-align-left align-left valign-middle" style="padding-left: 10px; padding-right: 10px;">
+        <view class="ui-col-content align-left valign-middle">
+          <view style="width: 100%;">
+            <view class="ui-row" style="height:30px;">
+              <view class="ui-col ui-col-align-left align-left valign-middle" style="">
+                <view class="ui-col-content align-left valign-middle">
+                  <text>{{item.title}}</text>
+                </view>
+              </view>
+            </view>
+            <view>地址：{{item.address}} 类别：{{item.category}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,26 @@
+<template>
+  <view>
+    <view style="font-size: 16px; color: #313338; text-align:center; margin:20rpx">{{news.title}}</view>
+    <image src={{news.newsImageSrc}} style="width:750rpx; height:600rpx;"/>
+    <p style="margin:20rpx">{{news.content}}</p>
+  </view>
+  
+</template>
+
+<script>
+export default {
+  config: {
+    navigationBarTitleText: '资讯详情'
+  },
+  data: {},
+  onLoad: function (options) {
+    let news = JSON.parse(options.news);
+    this.setData({
+      news: news
+    });
+  }
+}
+</script>
+
+<style lang="less">
+</style>
