@@ -16,16 +16,18 @@
     <view class="newslist">
       <ui-row id="{{index}}" bindtap="switchToNewsDetails" wx:for="{{newsArray}}" wx:key="key" height="80" border-bottom hover-class="touchui-hover">
         <ui-col width="80" align="center" vertical-align="middle">
-          <image src={{item.newsImageSrc}} width="50" height="50"/>
+          <image src={{item.newsImageSrc}}/>
         </ui-col>
         <ui-col class="text" align="left" vertical-align="middle" space="20">
           <view style="width: 100%;">
             <ui-row height="30">
-              <ui-col align="left" vertical-align="middle">
-                <text>{{item.title}}</text>
+              <ui-col class="title" align="left" vertical-align="middle">
+                {{item.title}}
               </ui-col>
             </ui-row>
-            <view>{{item.content}}</view>
+            <view class="content">
+              {{item.content}}
+            </view>
           </view>
         </ui-col>
       </ui-row>
@@ -89,15 +91,27 @@ export default {
 
 .newslist {
   .text {
-    text {
+    .title {
       font-size: 16px;
       color: #313338;
-    }
-    view {
-      color: #9c9fa4;
-      font-size: 12px;
       .mix-text-overflow();
     }
+    .content {
+      color: #9c9fa4;
+      font-size: 12px;
+      // height: 50px;
+      .mix-text-overflow();
+    }
+    // text {
+    //   font-size: 16px;
+    //   color: #313338;
+    //   // .mix-text-overflow();
+    // }
+    // view {
+    //   color: #9c9fa4;
+    //   font-size: 12px;
+    //   .mix-text-overflow();
+    // }
   }
 }
 </style>

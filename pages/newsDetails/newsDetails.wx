@@ -15,9 +15,11 @@
     <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
     <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}"></view>
 
-    <view style="font-size: 16px; color: #313338; text-align:center; margin:20rpx">{{news.title}}</view>
-    <image src={{news.newsImageSrc}} style="width:750rpx; height:600rpx;"/>
-    <p style="margin:20rpx">{{news.content}}</p>
+    <view style="font-size: 20px; font-weight:bold; color: #313338; text-align:center; margin:20rpx; margin-top:40rpx;">
+      {{news.title}}
+    </view>
+    <image src={{news.newsImageSrc}} style="width:670rpx; height:600rpx; display:block; margin:40rpx"/>
+    <text space="emsp" style="display:block; margin:40rpx">  {{news.content}}</text>
   </view>
   
 </template>
