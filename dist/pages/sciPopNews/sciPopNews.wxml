@@ -1,5 +1,20 @@
 <!-- newsArray news:newsImageSrc title content switchToNewsDetails -->
 <view>
+  <!--导航栏-->
+  <view class="nav_bar" style="height:{{NAV_HEIGHT*2}}rpx;">
+    <view class="ui-row" style="height:{{STATUS_BAR_HEIGHT}}px;"></view>
+    <!--用于占去状态栏的位置-->
+    <view class="ui-row" style="height:{{DEFAULT_HEADER_HEIGHT}}px;">
+      <view style="color: #fff;flex:0 0 {{WIN_WIDTH}}px;" class="ui-col ui-col-align-center align-center valign-middle">
+        <view class="ui-col-content align-center valign-middle">
+          科普资讯
+        </view>
+      </view>
+    </view>
+  </view>
+  <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
+  <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}"></view>
+
   <view class="newslist">
     <view id="{{index}}" bindtap="switchToNewsDetails" wx:for="{{newsArray}}" wx:key="key" hover-class="touchui-hover" class="ui-row ui-row-border-bottom" style="height:80px;">
       <view class="ui-col ui-col-align-center align-center valign-middle" style="flex:0 0 80px;">

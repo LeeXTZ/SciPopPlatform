@@ -1,12 +1,28 @@
 <template>
   <view>
+    <!--导航栏-->
+    <view class="nav_bar" style="height:{{NAV_HEIGHT*2}}rpx;">
+      <ui-row height="{{STATUS_BAR_HEIGHT}}"></ui-row> <!--用于占去状态栏的位置-->
+      <ui-row height="{{DEFAULT_HEADER_HEIGHT}}">
+        <ui-col vertical-align="middle" align="center" width="40" bindtap="navigateBack">
+          <ui-icon type="arrow-left" size="16" color="#fff"></ui-icon>
+        </ui-col>
+        <ui-col vertical-align="middle" align="center" space-right="40" style="color: #fff;">
+          场馆详情
+        </ui-col>
+      </ui-row>
+    </view>
+    <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
+    <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}"></view>
+
+    <!-- 地图 -->
     <map id="detailMap" subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4"
-      markers="{{markers}}" style="width:100%;height:300px;"
+      markers="{{markers}}" scale="17" show-location
       longitude="{{poi.location.lng}}" latitude="{{poi.location.lat}}"
-      scale='17' show-location>
+      style="width:100%;height:300px;">
     </map>
 
-<!-- 场馆信息待完善 -->
+    <!-- 场馆信息待完善 -->
     <ui-accordion bindchange="slide" header-height="50">
       <view slot="header">
         <ui-row height="50" border-bottom class="title">
@@ -17,11 +33,8 @@
         </ui-row>
       </view>
       <view slot="content">
-        <ui-row height="40" class='content'>
-          <ui-col vertical-align="middle" align="left" space-left="10">{{ item2.title }}</ui-col>
-          <ui-col vertical-align="middle" align="center" width="50">
-            <ui-icon name="{{ item.state==='abnormal' ? 'error':'success' }}" size="16" color="{{ item.state==='abnormal' ? '#F5AC29':'#2AA744' }}"></ui-icon>
-          </ui-col>
+        <ui-row height="auto" class='content'>
+          {{siteIntroductionContent}}
         </ui-row>
       </view>
     </ui-accordion>
@@ -91,32 +104,49 @@
 
 <script>
 export default {
-  config: {
-    navigationBarTitleText: ''
-  },
+  config: {},
   data: {
-    accordion:{
+    siteIntroductionContent:
+      "中国地质大学逸夫博物馆是国家三级博物馆，是首家被认定为国家AAAA级旅游景区的高校博物馆，是全国中小学生研学实践教育基地、全国科普教育基地、全国青少年科技教育基地、全国古生物教育基地、全国中小学环境教育社会实践基地、全国国土资源科普基地、武汉市爱国主义教育基地、2017武汉十大博物馆。中国地质大学逸夫博物馆的前身可以追溯到北京地质学院博物馆，始建1952年。建馆初期，标本主要继承了北京大学地质系、清华大学地质系、天津大学（北洋大学）地质系和唐山铁道学院地质科的收藏，历史己逾百年。学校迁址武汉时，部分标本也运至武汉，1982年武汉地质学院博物馆正式对外开放，1987年更名为中国地质大学（武汉）博物馆。2001年，受邵逸夫基金会和教育部专项资金资助，博物馆大楼建设启动，并于2003年落成，并更名为中国地质大学逸夫博物馆。",
 
-    }
+    // accordion:{
+    // },
+
+    STATUS_BAR_HEIGHT: wx.STATUS_BAR_HEIGHT,
+    DEFAULT_HEADER_HEIGHT: wx.DEFAULT_HEADER_HEIGHT,
+    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT
   },
-  onLoad: function (options) {
+  onLoad: function(options) {
     console.log(options.poi);
     let poi = JSON.parse(options.poi);
     this.setData({
       poi: poi,
-      markers:[{
-              title: poi.title,
-              id: poi.id,
-              latitude: poi.location.lat,
-              longitude: poi.location.lng,
-              iconPath: "../../static/images/location-doodle-48-blue.png",
-              width: 30,
-              height: 30
-            }]
+      markers: [
+        {
+          title: poi.title,
+          id: poi.id,
+          latitude: poi.location.lat,
+          longitude: poi.location.lng,
+          iconPath: "../../static/images/location-doodle-48-blue.png",
+          width: 30,
+          height: 30
+        }
+      ]
     });
+  },
+  navigateBack() {
+    wx.navigateBack();
   }
-}
+};
 </script>
 
 <style lang="less">
+.nav_bar {
+  width: 750rpx;
+  // height: 132rpx; //height需要用到逻辑层数据，在上面html中定义
+  // position:fixed; //改为fixed，则map会与导航栏重叠
+  // left:0;
+  // top:0;
+  background-color: #283350;
+}
 </style>

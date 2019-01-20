@@ -8,41 +8,64 @@ exports.default = Page({
     markers: [],
     pois: [],
     // description image src
-    descriptionImageSrc: "../../static/images/cuteColor/zhan-50.png",
+    descriptionImageSrc: "http://lorempixel.com/400/200",
     currLocation: {
       latitude: "30.5195640000",
       longitude: "114.4020540000"
-      // latitude: "39.9560697701",
-      // longitude: "116.2998962402"
     },
-    // 选项卡style
-    itemStyle: {
-      'height': '50rpx',
-      'color': '#333',
-      'border-color': '#333',
-      'background': 'transparent',
-      'line-height': '50rpx',
-      'font-size': '24rpx',
-      'width': '250rpx'
+
+    //自定义tab style
+    navBarStyle: {
+      //  "background-color": "#000000",
+      // "background-color": "#292e38"
+      "background-color": "#283350"
     },
-    activeItemStyle: {
-      'opacity': '1',
-      'color': '#fff',
-      'background-color': '#333'
-    }
+    inkBarStyle: {
+      "border-bottom": "6rpx solid #3d72ff",
+      width: "30%",
+      top: "-16rpx"
+    },
+    tabStyle: {
+      color: "#fff"
+      // color: "#333333",
+    },
+    DEFAULT_CONTENT_HEIGHT: wx.DEFAULT_CONTENT_HEIGHT,
+    WIN_WIDTH: wx.WIN_WIDTH,
+    WIN_HEIGHT: wx.WIN_HEIGHT,
+    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT + "px",
+    CONTAINER_HEIGHT: wx.WIN_HEIGHT - (wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT),
+
+    floatButtonImgSrcArray: ["../../static/images/float/map-blue.png", "../../static/images/float/list-blue.png"],
+    flag: 0
   },
   // 选项卡切换事件函数
   sgmChange: function sgmChange(e) {
     var index = e.detail.index;
 
-    var markersArray = [this.data.markers0, this.data.markers1, this.data.markers2];
-    var poisArray = [this.data.pois0, this.data.pois1, this.data.pois2];
+    var markers3 = this.data.markers0.concat(this.data.markers1).concat(this.data.markers2);
+    var pois3 = this.data.pois0.concat(this.data.pois1).concat(this.data.pois2);
+    var markersArray = [this.data.markers0, this.data.markers1, this.data.markers2, markers3];
+
+    var poisArray = [this.data.pois0, this.data.pois1, this.data.pois2, pois3];
     var descriptionImageSrcArray = ["../../static/images/cuteColor/zhan-50.png", "../../static/images/cuteColor/te-50.png", "../../static/images/cuteColor/she-50.png"];
     this.setData({
       markers: markersArray[index],
       pois: poisArray[index],
       descriptionImageSrc: descriptionImageSrcArray[index]
     });
+  },
+
+  // 浮动按钮点击函数
+  handleFloatButton: function handleFloatButton(e) {
+    if (this.data.flag) {
+      this.setData({
+        flag: 0
+      });
+    } else {
+      this.setData({
+        flag: 1
+      });
+    }
   },
 
   // 地图markers点击函数

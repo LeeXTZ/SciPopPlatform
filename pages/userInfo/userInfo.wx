@@ -1,9 +1,21 @@
 <template>
   <view>
+     <!--导航栏-->
+    <view class="nav_bar" style="height:{{NAV_HEIGHT*2}}rpx;">
+      <ui-row height="{{STATUS_BAR_HEIGHT}}"></ui-row> <!--用于占去状态栏的位置-->
+      <ui-row height="{{DEFAULT_HEADER_HEIGHT}}">
+        <ui-col vertical-align="middle" align="center" width="{{WIN_WIDTH}}" style="color: #fff;">
+          我的
+        </ui-col>
+      </ui-row>
+    </view>
+    <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
+    <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}"></view>
+
     <view class="userinfo-container">
       <button class="getUserinfo-button" wx:if="{{!hasUserInfo}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 请点击登录 </button>
       <block wx:else>
-        <ui-blur height="300" url="{{ userInfo.avatarUrl }}">
+        <ui-blur height="260" url="{{ userInfo.avatarUrl }}">
           <view class="top_content">
             <view>
               <image src="{{ userInfo.avatarUrl }}" mode='aspectFill' />
@@ -47,6 +59,10 @@ export default {
     navigationBarTitleText: "我的"
   },
   data: {
+    WIN_WIDTH: wx.WIN_WIDTH,
+    STATUS_BAR_HEIGHT: wx.STATUS_BAR_HEIGHT,
+    DEFAULT_HEADER_HEIGHT: wx.DEFAULT_HEADER_HEIGHT,
+    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
     // motto: 'Hello World',
     userInfo: {},
     hasUserInfo: false,
@@ -62,11 +78,6 @@ export default {
       "line-height": "46px"
     }
   },
-  // onPageScroll(e) {
-  //   this.setData({
-  //     scrollTop: e.scrollTop
-  //   });
-  // },
   //事件处理函数
   bindViewTap: function() {
     wx.navigateTo({
@@ -121,59 +132,58 @@ export default {
 </script>
 
 <style lang="less">
+.nav_bar {
+  width: 750rpx;
+  // height: 132rpx; //height需要用到逻辑层数据，在上面html中定义
+  background-color: #283350;
+}
+
 .userinfo-container {
   display: flex;
   flex-direction: column;
 }
 
-.getUserinfo-button{
+.getUserinfo-button {
   display: flex;
   flex-direction: column;
   align-self: center;
   width: 375rpx;
 }
 
-// .userinfo-avatar {
-//   width: 128rpx;
-//   height: 128rpx;
-//   margin: 20rpx;
-//   border-radius: 50%;
-// }
-
 .userinfo-nickname {
   color: #aaa;
 }
 
-.userinfo-container{
-  .top_content{
+.userinfo-container {
+  .top_content {
     width: 100%;
     // height: 100%;
     position: absolute;
-    bottom:20px;
-    view{
+    bottom: 20px;
+    view {
       .mix-flex-center();
       color: #fff;
       font-size: 16px;
-      image{
+      image {
         height: 120rpx;
         width: 120rpx;
         border-radius: 50%;
         border: 2px solid #fff;
       }
-      .ui-icon{
+      .ui-icon {
         margin-left: 10px;
       }
-      &.name{
+      &.name {
         padding: 20px 0;
       }
-      .ui-view{
+      .ui-view {
         display: inline-block;
         padding: 5px;
         border-radius: 25px;
         border: 1px solid #fff;
       }
-      &.card{
-        .ui-view{
+      &.card {
+        .ui-view {
           font-size: 14px;
         }
       }

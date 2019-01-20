@@ -19,12 +19,16 @@
 /* 水平垂直居中 */
 /* 超出部分出省略号 */
 /* 多行文本超出部分省略号 */
+.nav_bar {
+  width: 750rpx;
+  background-color: #283350;
+}
 .newslist .text text {
   font-size: 16px;
   color: #313338;
 }
 .newslist .text view {
-  color: #9C9FA4;
+  color: #9c9fa4;
   font-size: 12px;
   white-space: nowrap;
   text-overflow: ellipsis;

@@ -1,5 +1,26 @@
 <view>
-  <map id="detailMap" subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" markers="{{markers}}" style="width:100%;height:300px;" longitude="{{poi.location.lng}}" latitude="{{poi.location.lat}}" scale="17" show-location>
+  <!--导航栏-->
+  <view class="nav_bar" style="height:{{NAV_HEIGHT*2}}rpx;">
+    <view class="ui-row" style="height:{{STATUS_BAR_HEIGHT}}px;"></view>
+    <!--用于占去状态栏的位置-->
+    <view class="ui-row" style="height:{{DEFAULT_HEADER_HEIGHT}}px;">
+      <view bindtap="navigateBack" class="ui-col ui-col-align-center align-center valign-middle" style="flex:0 0 40px;">
+        <view class="ui-col-content align-center valign-middle">
+          <span type="arrow-left" size="16" color="#fff" class="ui-icon icon-arrow-left" style="color: #fff;font-size: 16px;"></span>
+        </view>
+      </view>
+      <view style="color: #fff;padding-right: 40px;" class="ui-col ui-col-align-center align-center valign-middle">
+        <view class="ui-col-content align-center valign-middle">
+          场馆详情
+        </view>
+      </view>
+    </view>
+  </view>
+  <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
+  <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}"></view>
+
+  <!-- 地图 -->
+  <map id="detailMap" subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" markers="{{markers}}" scale="17" show-location longitude="{{poi.location.lng}}" latitude="{{poi.location.lat}}" style="width:100%;height:300px;">
   </map>
 
   <!-- 场馆信息待完善 -->
@@ -17,15 +38,8 @@
       </view>
     </view>
     <view slot="content">
-      <view class="content ui-row" style="height:40px;">
-        <view class="ui-col ui-col-align-left align-left valign-middle" style="padding-left: 10px;">
-          <view class="ui-col-content align-left valign-middle">{{ item2.title }}</view>
-        </view>
-        <view class="ui-col ui-col-align-center align-center valign-middle" style="flex:0 0 50px;">
-          <view class="ui-col-content align-center valign-middle">
-            <span name="{{ item.state==='abnormal' ? 'error':'success' }}" size="16" color="{{ item.state==='abnormal' ? '#F5AC29':'#2AA744' }}" class="ui-icon" style="color: {{ item.state==='abnormal' ? '#F5AC29':'#2AA744' }};font-size: 16px;"></span>
-          </view>
-        </view>
+      <view class="content ui-row" style="height:autopx;">
+        {{siteIntroductionContent}}
       </view>
     </view>
   </ui-accordion>

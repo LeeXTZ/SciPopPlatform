@@ -1,7 +1,8 @@
 {
   "usingComponents": {
-    "ui-segment": "../../packages/touchui-wx-components/ui-segment/dist/index",
-    "ui-segment-item": "../../packages/touchui-wx-components/ui-segment-item/dist/index"
+    "ui-nav-bar": "../../packages/touchui-wx-components/ui-nav-bar/dist/index",
+    "ui-tabs": "../../packages/touchui-wx-components/ui-tabs/dist/index",
+    "ui-tab": "../../packages/touchui-wx-components/ui-tab/dist/index"
   },
   "navigationBarTitleText": "科普场馆"
 }

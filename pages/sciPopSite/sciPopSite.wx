@@ -1,43 +1,80 @@
 <template>
   <view>
-    <map id="myMap" subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4"
-      markers="{{markers}}" bindmarkertap="switchToSiteDetails" 
-      style="width:100%;height:300px;"
-      longitude="{{currLocation.longitude}}" latitude="{{currLocation.latitude}}"
-      scale='13' show-location>
-    </map>
-
-    <view style="height:10rpx"></view>
-    <ui-segment bindchange="sgmChange" item-style="{{itemStyle}}" active-item-style="{{activeItemStyle}}">
-      <ui-segment-item>
-        展教联盟
-      </ui-segment-item>
-      <ui-segment-item>
-        特色场馆
-      </ui-segment-item>
-      <ui-segment-item>
-        社区科普大学
-      </ui-segment-item>
-    </ui-segment>
-    <view style="height:10rpx"></view>
-    
-    <view class="description">
-      <ui-row id="{{item.id}}" bindtap="switchToSiteDetails" wx:for="{{pois}}" wx:key="key" height="80" border-bottom hover-class="touchui-hover">
-        <ui-col width="80" align="center" vertical-align="middle">
-          <image src={{descriptionImageSrc}} width="50" height="50"/>
-        </ui-col>
-        <ui-col class="text" align="left" vertical-align="middle" space="20">
-          <view style="width: 100%;">
-            <ui-row height="30">
-              <ui-col align="left" vertical-align="middle">
-                <text>{{item.title}}</text>
-              </ui-col>
-            </ui-row>
-            <view>地址：{{item.address}} 类别：{{item.category}}</view>
-          </view>
+    <!-- 导航栏 -->
+    <ui-nav-bar slot="nav-bar" class="nav_bar" custom-style="{{ navBarStyle }}">
+      <ui-row height="46">
+        <ui-col vertical-align="middle">
+          <ui-tabs ink-bar ink-bar-style="{{ inkBarStyle }}" tab-style="{{tabStyle}}"
+          width="{{ WIN_WIDTH-130 }}" index="{{ current }}" bindchange="sgmChange">
+            <ui-tab>
+                  <view class="">展教联盟</view>
+            </ui-tab>
+            <ui-tab>
+                    <view class="">特色场馆</view>
+            </ui-tab>
+            <ui-tab>
+                    <view class="">科普大学</view>
+            </ui-tab>
+            <ui-tab>
+                    <view class="">全部</view>
+            </ui-tab>
+           
+          </ui-tabs>
         </ui-col>
       </ui-row>
+    </ui-nav-bar>
+
+    <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
+    <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}"></view>
+    <!-- <cover-image src={{floatButtonImgSrcArray[0]}} style="width:100rpx;height:100rpx;"/> -->
+
+    <!-- 场馆卡片 / 场馆地图 / 切换按钮 -->
+    <view class="container">
+      <view wx:if="{{!flag}}">
+        <view class="sites_cards" id="{{item.id}}" bindtap="switchToSiteDetails" wx:for="{{pois}}" wx:key="key" height="80" border-bottom hover-class="touchui-hover">
+          <!-- <view class="site_card"> -->
+          <view class="site_card_image">
+              <image src="http://lorempixel.com/400/200" style="height:300rpx"/>
+          </view>
+
+          <ui-row>
+            <!-- <ui-col width="80" height="80" align="center" vertical-align="middle">
+              <image src={{descriptionImageSrc}} style="height:160rpx"/>
+            </ui-col> -->
+            <ui-col class="text" align="left" vertical-align="middle" space="20">
+              <view style="width: 100%;">
+                <ui-row height="30">
+                  <ui-col align="left" vertical-align="middle">
+                    <text>{{item.title}}</text>
+                  </ui-col>
+                </ui-row>
+                <view>地址：{{item.address}} 类别：{{item.category}}</view>
+              </view>
+            </ui-col>
+          </ui-row>
+        </view>
+        <cover-view class="floatButton" bindtap="handleFloatButton">
+          <cover-image class="floatImage" src={{floatButtonImgSrcArray[0]}} style="visibility:visible"/>
+        </cover-view>
+      </view>
+
+      <view wx:elif="{{flag}}">
+        <!-- subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" -->
+        <map id="sitesMap" bindmarkertap="switchToSiteDetails"
+          markers="{{markers}}" scale="15" 
+          longitude="{{currLocation.longitude}}" latitude="{{currLocation.latitude}}"
+          style="width:100%;height:{{CONTAINER_HEIGHT}}px;position:fixed;left:0;top:{{NAV_HEIGHT}}px">
+        </map>
+        <cover-view class="floatButton" bindtap="handleFloatButton">
+          <cover-image class="floatImage" src={{floatButtonImgSrcArray[1]}} style="visibility:visible"/>
+        </cover-view>
+      </view>
+
+      <!-- <cover-view class="floatButton" bindtap="handleFloatButton">
+          <cover-image class="img" src={{floatButtonImgSrcArray[0]}} style="visibility:visible"/>
+      </cover-view> -->
     </view>
+    
   </view>
 </template>
 
@@ -45,50 +82,84 @@
 export default {
   config: {
     navigationBarTitleText: "科普场馆"
+    // backgroundColor: "#333333"
   },
   data: {
     markers: [],
     pois: [],
     // description image src
-    descriptionImageSrc: "../../static/images/cuteColor/zhan-50.png",
+    descriptionImageSrc: "http://lorempixel.com/400/200",
     currLocation: {
       latitude: "30.5195640000",
       longitude: "114.4020540000"
-      // latitude: "39.9560697701",
-      // longitude: "116.2998962402"
     },
-    // 选项卡style
-    itemStyle:{
-      'height':'50rpx',
-      'color': '#333',
-      'border-color':'#333',
-      'background': 'transparent',
-      'line-height': '50rpx',
-      'font-size':'24rpx',
-      'width':'250rpx'
+
+    //自定义tab style
+    navBarStyle: {
+      //  "background-color": "#000000",
+      // "background-color": "#292e38"
+      "background-color": "#283350"
     },
-    activeItemStyle:{
-      'opacity': '1',
-      'color': '#fff',
-      'background-color': '#333'
-    }
+    inkBarStyle: {
+      "border-bottom": "6rpx solid #3d72ff",
+      width: "30%",
+      top: "-16rpx"
+    },
+    tabStyle: {
+      color: "#fff"
+      // color: "#333333",
+    },
+    DEFAULT_CONTENT_HEIGHT: wx.DEFAULT_CONTENT_HEIGHT,
+    WIN_WIDTH: wx.WIN_WIDTH,
+    WIN_HEIGHT: wx.WIN_HEIGHT,
+    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT + "px",
+    CONTAINER_HEIGHT:
+      wx.WIN_HEIGHT - (wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT),
+
+    floatButtonImgSrcArray: [
+      "../../static/images/float/map-blue.png",
+      "../../static/images/float/list-blue.png"
+    ],
+    flag: 0
   },
   // 选项卡切换事件函数
-  sgmChange (e) {
-        let index = e.detail.index;
+  sgmChange(e) {
+    let index = e.detail.index;
 
-        let markersArray = [this.data.markers0, this.data.markers1, this.data.markers2];
-        let poisArray = [this.data.pois0, this.data.pois1, this.data.pois2];
-        let descriptionImageSrcArray = [
-          "../../static/images/cuteColor/zhan-50.png",
-          "../../static/images/cuteColor/te-50.png",
-          "../../static/images/cuteColor/she-50.png",
-        ]
-        this.setData({
-          markers: markersArray[index],
-          pois: poisArray[index],
-          descriptionImageSrc: descriptionImageSrcArray[index]
-        });
+    let markers3 = this.data.markers0
+      .concat(this.data.markers1)
+      .concat(this.data.markers2);
+    let pois3 = this.data.pois0.concat(this.data.pois1).concat(this.data.pois2);
+    let markersArray = [
+      this.data.markers0,
+      this.data.markers1,
+      this.data.markers2,
+      markers3
+    ];
+
+    let poisArray = [this.data.pois0, this.data.pois1, this.data.pois2, pois3];
+    let descriptionImageSrcArray = [
+      "../../static/images/cuteColor/zhan-50.png",
+      "../../static/images/cuteColor/te-50.png",
+      "../../static/images/cuteColor/she-50.png"
+    ];
+    this.setData({
+      markers: markersArray[index],
+      pois: poisArray[index],
+      descriptionImageSrc: descriptionImageSrcArray[index]
+    });
+  },
+  // 浮动按钮点击函数
+  handleFloatButton(e) {
+    if (this.data.flag) {
+      this.setData({
+        flag: 0
+      });
+    } else {
+      this.setData({
+        flag: 1
+      });
+    }
   },
   // 地图markers点击函数
   switchToSiteDetails(e) {
@@ -96,11 +167,10 @@ export default {
     if (e.hasOwnProperty("markerId")) {
       id_tapped = e.markerId;
       console.log("---您点击了地图标记：" + id_tapped);
-    }else{
+    } else {
       id_tapped = e.currentTarget.id;
       console.log("---您点击了列表：" + id_tapped);
     }
-    
 
     // poi.id 与 markers.id 同
     // let poisArray = [this.data.pois0, this.data.pois1, this.data.pois2];
@@ -133,18 +203,16 @@ export default {
         _this.setData({
           currLocation: currLocation
         });
-
       },
       fail: function(e) {
         console.log("---获取当前位置失败: " + e);
       },
       complete: function() {
-        var poiTypes = ["大学", "博物馆", "会展中心"]
+        var poiTypes = ["大学", "博物馆", "会展中心"];
 
         poiTypes.forEach((poiType, index) => {
           getPois(poiType, index);
         });
-
       }
     });
 
@@ -153,8 +221,9 @@ export default {
       qqmapsdk.reverseGeocoder({
         location: _this.data.currLocation,
         get_poi: 1, //是否返回周边POI列表：1.返回；0不返回(默认),非必须参数
-        poi_options: "category=" + poiType + ";page_size=20;page_index=1;radius=5000",
-      
+        poi_options:
+          "category=" + poiType + ";page_size=20;page_index=1;radius=5000",
+
         success: function(res_reverseGeocoder) {
           var pois = res_reverseGeocoder.result.pois;
           // result.push(pois);
@@ -198,8 +267,7 @@ export default {
               break;
             default:
               break;
-          }     
-         
+          }
         },
         fail: function(error) {
           console.error("---获取poi失败：" + error);
@@ -211,4 +279,50 @@ export default {
 </script>
 
 <style lang="less">
+Page {
+  background-color: #eee;
+}
+
+// .container {
+//   position: fixed;
+//   left: 0;
+
+// }
+
+.sites_cards {
+  // border: 2rpx solid #ffffff;
+  border-radius: 6rpx;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  margin: 28rpx;
+  margin-bottom: 32rpx;
+  position: relative;
+}
+
+.floatButton {
+  position: fixed;
+  right: 80rpx;
+  bottom: 80rpx;
+  width: 110rpx;
+  height: 110rpx;
+  visibility: visible;
+  border-radius: 50%;
+
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+  // z-index: 100;
+}
+
+.floatImage {
+  // visibility: visible;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+}
 </style>

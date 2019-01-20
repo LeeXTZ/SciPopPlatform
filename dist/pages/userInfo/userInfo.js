@@ -9,6 +9,10 @@ var items = ["账号信息", "收藏", "设置", "关于"];
 
 exports.default = Page({
   data: {
+    WIN_WIDTH: wx.WIN_WIDTH,
+    STATUS_BAR_HEIGHT: wx.STATUS_BAR_HEIGHT,
+    DEFAULT_HEADER_HEIGHT: wx.DEFAULT_HEADER_HEIGHT,
+    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
     // motto: 'Hello World',
     userInfo: {},
     hasUserInfo: false,
@@ -24,11 +28,6 @@ exports.default = Page({
       "line-height": "46px"
     }
   },
-  // onPageScroll(e) {
-  //   this.setData({
-  //     scrollTop: e.scrollTop
-  //   });
-  // },
   //事件处理函数
   bindViewTap: function bindViewTap() {
     wx.navigateTo({

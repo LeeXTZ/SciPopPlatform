@@ -9,10 +9,10 @@
 		"postcss": true,
 		"minified": true,
 		"newFeature": true,
-		"autoAudits": true
+		"autoAudits": false
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.4.3",
+	"libVersion": "2.5.0",
 	"appid": "wx544ddca1cd1a7e51",
 	"projectname": "SciPopPlatform",
 	"debugOptions": {

@@ -12,27 +12,34 @@
     }
   },
   "tabBar": {
+    "color": "#b1b1b1",
+    "selectedColor": "#ffffff",
+    "backgroundColor": "#283350",
     "list": [
       {
-        "text": "科普场馆",
+        "iconPath": "static/images/tabBar/museum.png",
+        "selectedIconPath": "static/images/tabBar/museum-fill.png",
+        "text": "场馆",
         "pagePath": "pages/sciPopSite/sciPopSite"
       },
       {
-        "text": "科普资讯",
+        "iconPath": "static/images/tabBar/read.png",
+        "selectedIconPath": "static/images/tabBar/read-fill.png",
+        "text": "资讯",
         "pagePath": "pages/sciPopNews/sciPopNews"
       },
       {
+        "iconPath": "static/images/tabBar/user.png",
+        "selectedIconPath": "static/images/tabBar/user_fill.png",
         "text": "我的",
         "pagePath": "pages/userInfo/userInfo"
       }
     ]
   },
   "window": {
+    "navigationStyle": "custom",
     "backgroundTextStyle": "dark",
-    "backgroundColor": "#efefef",
-    "navigationBarBackgroundColor": "#ffffff",
-    "navigationBarTitleText": "TouchUI",
-    "navigationBarTextStyle": "black"
+    "backgroundColor": "#fff"
   },
   "networkTimeout": {
     "request": 10000

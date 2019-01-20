@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = Page({
   data: {
+    WIN_WIDTH: wx.WIN_WIDTH,
+    STATUS_BAR_HEIGHT: wx.STATUS_BAR_HEIGHT,
+    DEFAULT_HEADER_HEIGHT: wx.DEFAULT_HEADER_HEIGHT,
+    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
     newsArray: [{
       newsImageSrc: "http://filecloud.kepu.gov.cn/kepufile/article/XDyTrEnB2K44jMAA2rHYp2D6S2G7SKts.jpg",
       title: "最全！2018年度国家科学技术奖励名单",
