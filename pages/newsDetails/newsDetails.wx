@@ -12,7 +12,7 @@
         </ui-col>
       </ui-row>
     </view>
-    <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
+    <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到导航栏中-->
     <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}"></view>
 
     <view style="font-size: 20px; font-weight:bold; color: #313338; text-align:center; margin:20rpx; margin-top:40rpx;">

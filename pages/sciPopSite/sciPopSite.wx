@@ -44,7 +44,7 @@
             <ui-col class="text" align="left" vertical-align="middle" space="20">
               <view style="width: 100%;">
                 <ui-row height="30">
-                  <ui-col align="left" vertical-align="middle">
+                  <ui-col align="left" vertical-align="middle" style="font-size:36rpx; font-weight:bold;">
                     <text>{{item.title}}</text>
                   </ui-col>
                 </ui-row>
@@ -138,15 +138,11 @@ export default {
     ];
 
     let poisArray = [this.data.pois0, this.data.pois1, this.data.pois2, pois3];
-    let descriptionImageSrcArray = [
-      "../../static/images/cuteColor/zhan-50.png",
-      "../../static/images/cuteColor/te-50.png",
-      "../../static/images/cuteColor/she-50.png"
-    ];
+
     this.setData({
       markers: markersArray[index],
       pois: poisArray[index],
-      descriptionImageSrc: descriptionImageSrcArray[index]
+      // descriptionImageSrc: descriptionImageSrcArray[index]
     });
   },
   // 浮动按钮点击函数
@@ -229,7 +225,7 @@ export default {
           // result.push(pois);
           console.log("---获取poi成功：" + pois);
 
-          var mks = [];
+          let mks = [];
           // 当get_poi为1时，检索当前位置或者location周边poi数据并在地图显示，可根据需求是否使用
           for (var i = 0; i < pois.length; i++) {
             mks.push({
@@ -237,9 +233,19 @@ export default {
               id: pois[i].id,
               latitude: pois[i].location.lat,
               longitude: pois[i].location.lng,
-              iconPath: "../../static/images/location-doodle-48-blue.png",
+              iconPath: "../../static/images/marker/marker-40.png",
               width: 30,
-              height: 30
+              height: 30,
+              callout:{
+                content:pois[i].title,
+                fontSize:10,
+                color:"#ffffff",
+                bgColor:"#000000",
+                padding:2,
+                borderRadius:4,
+                // boxShadow:"4px 8px 16px 0 rgba(0)",
+                display:"ALWAYS"
+              }
             });
           }
           // result.push(mks);

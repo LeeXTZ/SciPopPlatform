@@ -24,7 +24,7 @@ exports.default = Page({
         id: poi.id,
         latitude: poi.location.lat,
         longitude: poi.location.lng,
-        iconPath: "../../static/images/location-doodle-48-blue.png",
+        iconPath: "../../static/images/marker/marker-40.png",
         width: 30,
         height: 30
       }]

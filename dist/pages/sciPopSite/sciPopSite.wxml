@@ -45,7 +45,7 @@
             <view class="ui-col-content align-left valign-middle">
               <view style="width: 100%;">
                 <view class="ui-row" style="height:30px;">
-                  <view class="ui-col ui-col-align-left align-left valign-middle" style="">
+                  <view style="font-size:36rpx; font-weight:bold;" class="ui-col ui-col-align-left align-left valign-middle">
                     <view class="ui-col-content align-left valign-middle">
                       <text>{{item.title}}</text>
                     </view>

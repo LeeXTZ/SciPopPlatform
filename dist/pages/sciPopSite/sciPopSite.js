@@ -47,11 +47,11 @@ exports.default = Page({
     var markersArray = [this.data.markers0, this.data.markers1, this.data.markers2, markers3];
 
     var poisArray = [this.data.pois0, this.data.pois1, this.data.pois2, pois3];
-    var descriptionImageSrcArray = ["../../static/images/cuteColor/zhan-50.png", "../../static/images/cuteColor/te-50.png", "../../static/images/cuteColor/she-50.png"];
+
     this.setData({
       markers: markersArray[index],
-      pois: poisArray[index],
-      descriptionImageSrc: descriptionImageSrcArray[index]
+      pois: poisArray[index]
+      // descriptionImageSrc: descriptionImageSrcArray[index]
     });
   },
 
@@ -144,9 +144,19 @@ exports.default = Page({
               id: pois[i].id,
               latitude: pois[i].location.lat,
               longitude: pois[i].location.lng,
-              iconPath: "../../static/images/location-doodle-48-blue.png",
+              iconPath: "../../static/images/marker/marker-40.png",
               width: 30,
-              height: 30
+              height: 30,
+              callout: {
+                content: pois[i].title,
+                fontSize: 10,
+                color: "#ffffff",
+                bgColor: "#000000",
+                padding: 2,
+                borderRadius: 4,
+                // boxShadow:"4px 8px 16px 0 rgba(0)",
+                display: "ALWAYS"
+              }
             });
           }
           // result.push(mks);
