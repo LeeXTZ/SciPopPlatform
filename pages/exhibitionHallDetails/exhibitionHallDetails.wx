@@ -1,38 +1,47 @@
 <template>
   <view>
-    <!--导航栏-->
-    <ui-nav-bar slot="nav-bar" class="nav_bar" custom-style="{{ navBarStyle }}">
+     <!--导航栏-->
+    <ui-nav-bar slot="nav-bar" class="nav_bar" custom-style="{{ navBarStyle }}" style="height:{{NAV_HEIGHT*2}}rpx;">
       <!-- <ui-row height="{{STATUS_BAR_HEIGHT}}"></ui-row> 用于占去状态栏的位置 -->
       <ui-row height="{{DEFAULT_HEADER_HEIGHT}}">
         <ui-col vertical-align="middle" align="center" width="40" bindtap="navigateBack">
           <ui-icon type="arrow-left" size="16" color="#fff"></ui-icon>
         </ui-col>
         <ui-col vertical-align="middle" align="center" space-right="40" style="font-size: 30rpx; color: #fff;">
-          {{siteData.name}}
+          {{hallData.name}}
         </ui-col>
       </ui-row>
     </ui-nav-bar>
     <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
     <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}px"></view>
 
-    <!-- 地图 -->
-    <!-- subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" -->
-    <map id="detailMap" bindmarkertap="switchToExhibitionHallDetails"
-      markers="{{markers}}" scale="{{scale}}" show-location
-      longitude="{{siteData.longitude}}" latitude="{{siteData.latitude}}"
+    <!-- 若typeid==2，显示地图、评论、导航按钮 -->
+    <map wx:if="{{tabIndex==2}}" id="detailMap" bindmarkertap="switchToExhibitionHallDetails"
+    subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4"
+      markers="{{markers}}" scale="13" show-location
+      longitude="{{hallData.longitude}}" latitude="{{hallData.latitude}}"
       style="width:100%;height:600rpx;">
     </map>
-    <!-- 如果tabIndex不为2，显示评论和导航按钮 -->
-    <cover-view wx:if="{{tabIndex!=2}}" class="floatButton" bindtap="handleEvalButton" style="top:{{NAV_HEIGHT+400}}rpx">
+    <cover-view wx:if="{{tabIndex==2}}" class="floatButton" bindtap="handleEvalButton" style="top:{{NAV_HEIGHT+400}}rpx">
       <cover-image class="floatImage" src="../../static/images/float/eval.png" style="visibility:visible"/>
     </cover-view>
-    <cover-view wx:if="{{tabIndex!=2}}" class="floatButton" bindtap="handleNaviButton" style="top:{{NAV_HEIGHT+520}}rpx">
+    <cover-view wx:if="{{tabIndex==2}}" class="floatButton" bindtap="handleNaviButton" style="top:{{NAV_HEIGHT+520}}rpx">
       <cover-image class="floatImage" src="../../static/images/float/navi.png" style="visibility:visible"/>
     </cover-view>
+
+    <!-- 否则显示图片轮播 -->
+    <swiper class="swiper" wx:else indicator-dots="true" autoplay="false">
+      <block wx:for="{{pictures}}" wx:key="key">
+        <swiper-item>
+          <image src="{{item}}" class="slide-image"/>
+        </swiper-item>
+      </block>
+    </swiper>
+
     <!-- 评论popup -->
     <ui-popup show="{{ show }}" height="270" background="transparent">
       <view class="evalPopup">
-          <ui-row height="40" border-bottom class="title">
+          <ui-row height="40" border-bottom>
               <ui-col vertical-align="middle" space-left="20">评论</ui-col>
               <ui-col width="40" vertical-align="middle" align="center" bindtap="deShow">
                   <ui-icon type="x" size="18" color="#FC8950"></ui-icon>
@@ -63,23 +72,25 @@
       </view>
     </ui-popup>
 
-        <!-- 场馆介绍 -->
+    <!-- 展厅/大学信息 -->
+    <!-- 展厅介绍 -->
     <ui-accordion bindchange="slide" header-height="50">
       <view slot="header" class="header">
-        <ui-row height="50" >
+        <ui-row height="50" border-bottom>
           <ui-col vertical-align="middle" align="left" space-left="10">
-            场馆介绍
+            {{hallData.name}}介绍
           </ui-col>
+          <ui-col vertical-align="middle" align="center" width="30"></ui-col>
         </ui-row>
       </view>
       <view slot="content">
         <ui-row height="auto" class='content'>
-          {{siteData.introduction}}
+          {{hallData.introduction}}
         </ui-row>
       </view>
     </ui-accordion>
-        <!-- 用户评论 -->
-    <ui-accordion wx:if="{{tabIndex!=2}}" bindchange="slide" header-height="50">
+     <!-- 用户评论 -->
+    <ui-accordion wx:if="{{tabIndex==2}}" bindchange="slide" header-height="50">
       <view slot="header" class="header">
         <ui-row height="50" >
           <ui-col vertical-align="middle" align="left" space-left="10">
@@ -100,7 +111,7 @@
                 <view style="width: 100%;">
                   <ui-row class="hallTitle" height="30">
                     <ui-col align="left" vertical-align="middle">
-                     评分： {{item.star}}
+                      评分：{{item.star}}
                     </ui-col>
                   </ui-row>
                   <view class="hallContent">
@@ -116,19 +127,66 @@
         暂无
       </view>
     </ui-accordion>
-        <!-- 展厅/大学列表 -->
+    <!-- 音频资源 -->
     <ui-accordion bindchange="slide" header-height="50">
       <view slot="header" class="header">
-        <ui-row height="50" >
+        <ui-row height="50" border-bottom>
           <ui-col vertical-align="middle" align="left" space-left="10">
-            展厅/大学列表
+            音频资源
           </ui-col>
+          <ui-col vertical-align="middle" align="center" width="30"></ui-col>
         </ui-row>
       </view>
-      <!-- 若展厅列表不为空： -->
-      <view wx:if="{{exhibitionHallList.length!=0}}" slot="content" class="content exhibitionHallList" >
-        
-            <ui-row id="{{index}}" bindtap="switchToExhibitionHallDetails" wx:for="{{exhibitionHallList}}" wx:key="key" height="80" border-bottom hover-class="touchui-hover">
+      <view slot="content">
+        <ui-row height="auto" class='content'>
+          <view wx:if="{{hallData.audio=='暂无'}}">暂无</view>
+          <audio wx:else
+            id="myAudio" 
+            src="https://www.hongshankexie.com{{hallData.audio}}" 
+            poster="../../static/images/audio_poster.jpg" 
+            controls="true"
+            name="音频解说" 
+            author="{{hallData.name}}"
+            ><audio>
+        </ui-row>
+      </view>
+      
+    </ui-accordion>
+    <!-- 视频资源 -->
+    <ui-accordion bindchange="slide" header-height="50">
+      <view slot="header" class="header">
+        <ui-row height="50" border-bottom>
+          <ui-col vertical-align="middle" align="left" space-left="10">
+            视频资源
+          </ui-col>
+          <ui-col vertical-align="middle" align="center" width="30"></ui-col>
+        </ui-row>
+      </view>
+      <view slot="content">
+        <ui-row height="auto" class='content'>
+          <view wx:if="{{hallData.video=='暂无'}}">暂无</view>
+          <video wx:else
+            id="myVideo"
+            src="{{hallData.video}}"
+            controls="true"
+          ></video>
+        </ui-row>
+      </view>
+    </ui-accordion>
+    <!-- 课程列表 -->
+    <ui-accordion wx:if="{{tabIndex==2}}"  bindchange="slide" header-height="50">
+      <view slot="header" class="header">
+        <ui-row height="50" border-bottom>
+          <ui-col  vertical-align="middle" align="left" space-left="10">
+            课程列表
+          </ui-col>
+
+          <ui-col vertical-align="middle" align="center" width="30"></ui-col>
+        </ui-row>
+      </view>
+      <!-- 若课程列表不为空 -->
+      <view wx:if="{{curriculumList.length!=0}}" slot="content" class="curriculumList">
+            <ui-row id="{{index}}" bindtap="switchToCurriculumDetails" wx:for="{{curriculumList}}" wx:key="key" height="80" border-bottom hover-class="touchui-hover">
               <!-- 左侧图片 -->
               <ui-col width="80" align="center" vertical-align="middle">
                 <image src="https://www.hongshankexie.com{{item.picture}}">
@@ -136,101 +194,95 @@
               <!-- 右侧文字 -->
               <ui-col class="text" align="left" vertical-align="middle" space="20">
                 <view style="width: 100%;">
-                  <ui-row class="hallTitle" height="30">
+                  <ui-row class="curriculumTitle" height="30">
                     <ui-col align="left" vertical-align="middle">
                       {{item.name}}
                     </ui-col>
                   </ui-row>
-                  <view class="hallContent">
+                  <view class="curriculumContent">
                     {{item.introduction}}
                   </view>
                 </view>
               </ui-col>
             </ui-row>
-         
       </view>
-      <!-- 若展厅列表为空 -->
-      <view wx:else slot="content" class="content" style="text-align: center;">
+      <!-- 若课程列表为空 -->
+      <view wx:else slot="content" style="text-align: center;">
         暂无
       </view>
     </ui-accordion>
-        <!-- 联系地址 -->
-    <ui-accordion bindchange="slide" header-height="50">
-      <view slot="header" class="header">
-        <ui-row height="50" >
-          <ui-col vertical-align="middle" align="left" space-left="10">
-            联系地址
-          </ui-col>
-        </ui-row>
-      </view>
-      <view slot="content">
-        <ui-row height="auto" class='content'>
-          {{siteData.address}}
-        </ui-row>
-      </view>
-    </ui-accordion>
-        <!-- 参观指南 -->
-    <ui-accordion bindchange="slide" header-height="50">
-      <view slot="header" class="header">
-        <ui-row height="50" >
-          
-          <ui-col vertical-align="middle" align="left" space-left="10">
-            参观指南
-          </ui-col>
-        </ui-row>
-      </view>
-      <view slot="content">
-        <ui-row wx:if="{{siteData.information==null}}" height="auto" class='content'>
-          暂无
-        </ui-row>
-        <ui-row wx:else height="auto" class='content'>
-          {{siteData.information}}
-        </ui-row>
-      </view>
-    </ui-accordion>
-    
 
   </view>
 </template>
 
 <script>
   export default {
-    config: {},
+    config: {
+      navigationBarTitleText: "展厅详情"
+    },
     data: {
       navBarStyle: {
         "background-color": "#283350"
       },
       STATUS_BAR_HEIGHT: wx.STATUS_BAR_HEIGHT,
       DEFAULT_HEADER_HEIGHT: wx.DEFAULT_HEADER_HEIGHT,
-      NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
-      scale: 17,
-      exhibitionHallList: []
+      NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT
     },
+
     onLoad: function(options) {
       var _this = this;
+      let hallData = JSON.parse(options.hallData);
 
-      // console.log(options.siteData);
-      let siteData = JSON.parse(options.siteData);
-      this.setData({
-        siteData: siteData,
-        tabIndex: options.tabIndex
-      });
-      this.getExhibitionHallList(siteData.id, options.tabIndex);
-      if (options.tabIndex != 2) {
-        this.getEvaluationList(siteData.id, options.tabIndex);
+      if (options.tabIndex == 2) {
+        let app = getApp();
+        let mks = [];
+        mks.push({
+          title: hallData.name,
+          id: hallData.id,
+          latitude: hallData.latitude,
+          longitude: hallData.longitude,
+          iconPath: "../../static/images/marker/marker-40.png",
+          width: 30,
+          height: 30
+        });
+
+        this.setData({
+          hallData: hallData,
+          markers: mks,
+          tabIndex: 2,
+          curriculumList: []
+        });
+        this.getEvaluationList(hallData.id, 2);
+        app.myGet({
+          _url: "/getcurriculumlist/" + hallData.id,
+          _success: function(data) {
+            _this.setData({
+              curriculumList: data.curriculumList
+            });
+          }
+        });
+      } else {
+        let pictures_str = hallData.pictures;
+        let pictures = pictures_str.split(",");
+        let pictures_long = pictures.map(item => {
+          return "https://www.hongshankexie.com" + item;
+        });
+        this.setData({
+          hallData: hallData,
+          pictures: pictures_long,
+          tabIndex: options.tabIndex
+        });
       }
     },
+
     navigateBack() {
       wx.navigateBack();
     },
-
     getEvaluationList: function(parentId, tabIndex) {
       let app = getApp();
       let _this = this;
-      let typestring = "allianceevaluation";
-      if (tabIndex == 1) {
-        typestring = "museumevaluation";
-      }
+      let typestring = "universityevaluation";
+
       app.myGet({
         _url: "/getlist/" + typestring + "/" + parentId,
         _method: "GET",
@@ -238,69 +290,6 @@
           _this.setData({
             evaluationList: data.evaluationList
           });
-        }
-      });
-    },
-    getExhibitionHallList: function(parentId, tabIndex) {
-      let app = getApp();
-      let _this = this;
-      let typestring = "exhibitionhalllist";
-      if (tabIndex == 2) {
-        typestring = "universitylist";
-      }
-      app.myGet({
-        _url: "/get" + typestring + "/" + parentId,
-        _method: "GET",
-        _success: function(data) {
-          if (typeof data.exhibitionHallList != "undefined") {
-            let mks = [];
-            mks.push({
-              title: _this.data.siteData.name,
-              id: _this.data.siteData.id,
-              latitude: _this.data.siteData.latitude,
-              longitude: _this.data.siteData.longitude,
-              iconPath: "../../static/images/marker/marker-40.png",
-              width: 30,
-              height: 30
-            });
-            _this.setData({
-              exhibitionHallList: data.exhibitionHallList,
-              markers: mks
-            });
-          } else if (typeof data.universityList != "undefined") {
-            let universityList = data.universityList;
-            let mks = [];
-            for (var i = 0; i < universityList.length; i++) {
-              mks.push({
-                title: universityList[i].name,
-                id: universityList[i].id,
-                latitude: universityList[i].latitude,
-                longitude: universityList[i].longitude,
-                iconPath: "../../static/images/marker/marker-40.png",
-                width: 30,
-                height: 30,
-                callout: {
-                  content: universityList[i].name,
-                  fontSize: 10,
-                  color: "#ffffff",
-                  bgColor: "#000000",
-                  padding: 2,
-                  borderRadius: 4,
-                  // boxShadow:"4px 8px 16px 0 rgba(0)",
-                  display: "ALWAYS"
-                }
-              });
-            }
-            _this.setData({
-              exhibitionHallList: universityList,
-              markers: mks,
-              scale: 14
-            });
-          } else {
-            _this.setData({
-              exhibitionHallList: []
-            });
-          }
         }
       });
     },
@@ -319,24 +308,12 @@
     formSubmit: function(e) {
       let _this = this;
       let app = getApp();
-      let typestring = "";
-      switch (this.data.tabIndex) {
-        case "0":
-          typestring = "allianceevaluation";
-          break;
-        case "1":
-          typestring = "museumevaluation";
-          break;
-        case "2":
-          typestring = "universityevaluation";
-          break;
-        default:
-          break;
-      }
+      let typestring = "universityevaluation";
+
       let postdata = {
         star: e.detail.value.star,
         review: e.detail.value.review,
-        parentId: this.data.siteData.id
+        parentId: this.data.hallData.id
       };
       app.myPost({
         _url: "/add/" + typestring,
@@ -359,45 +336,12 @@
         }
       });
     },
-
     handleNaviButton: function(e) {
       wx.openLocation({
-        latitude: parseFloat(this.data.siteData.latitude),
-        longitude: parseFloat(this.data.siteData.longitude),
-        name: this.data.siteData.name,
+        latitude: parseFloat(this.data.hallData.latitude),
+        longitude: parseFloat(this.data.hallData.longitude),
+        name: this.data.hallData.name,
         scale: 18
-      });
-    },
-
-    switchToExhibitionHallDetails: function(e) {
-      // let id_tapped = "";
-      let hallsData = this.data.exhibitionHallList;
-      let hallData = {};
-      // 若点击的是列表
-      if (!e.hasOwnProperty("markerId")) {
-        // id_tapped = e.currentTarget.id;
-        console.log("---列表项 【" + e.currentTarget.id + "】 被点击");
-        hallData = hallsData[e.currentTarget.id];
-      } else if (this.data.tabIndex == 2) {
-        // 若点击的是管理站页面中的地图标记
-        // id_tapped = e.markerId;
-        console.log("---地图标记项 【" + e.markerId + "】 被点击");
-        let res = hallsData.filter((value, index, array) => {
-          return value.id == e.markerId;
-        });
-        hallData = res[0];
-      } else {
-        // 若点击的是非管理站页面中的地图标记
-        return 0;
-      }
-
-      console.log("--传入第3级页面的hallData: " + JSON.stringify(hallData));
-      wx.navigateTo({
-        url:
-          "/pages/exhibitionHallDetails/exhibitionHallDetails?hallData=" +
-          JSON.stringify(hallData) +
-          "&tabIndex=" +
-          this.data.tabIndex
       });
     }
   };
@@ -406,7 +350,16 @@
 <style lang="less">
   .nav_bar {
     width: 750rpx;
+    // height: 132rpx; //height需要用到逻辑层数据，在上面html中定义
+    // position:fixed; //改为fixed，则map会与导航栏重叠
+    // left:0;
+    // top:0;
     background-color: #283350;
+  }
+
+  .swiper {
+    width: 100%;
+    height: 500rpx;
   }
 
   .floatButton {
@@ -449,7 +402,6 @@
       padding: 10px 20px;
     }
   }
-
   .section__title {
     float: left;
     width: 20%;
@@ -494,24 +446,18 @@
     // text-align: left;
   }
 
-  .exhibitionHallList {
+  .curriculumList {
     .text {
-      .hallTitle {
-        font-size: 32rpx;
+      .curriculumTitle {
+        font-size: 16px;
         color: #313338;
         .mix-text-overflow();
       }
-      .hallContent {
+      .curriculumContent {
         color: #9c9fa4;
-        font-size: 24rpx;
-        display: -webkit-box;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-wrap: break-word;
-        white-space: normal !important;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        margin-bottom: 24rpx;
+        font-size: 12px;
+        // height: 50px;
+        .mix-text-overflow();
       }
     }
   }

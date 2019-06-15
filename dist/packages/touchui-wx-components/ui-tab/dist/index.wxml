@@ -1,3 +1,0 @@
-<view class="ui-tab ui-tab-x {{ isParentInkBar ? 'border-none' : ''}} {{ active ? 'active' : '' }}" style="{{ selfStyle }}" bindtap="handleTap">
-  <slot></slot>
-</view>

@@ -5,7 +5,7 @@
       <ui-row height="46">
         <ui-col vertical-align="middle">
           <ui-tabs ink-bar ink-bar-style="{{ inkBarStyle }}" tab-style="{{tabStyle}}"
-          width="{{ WIN_WIDTH-130 }}" index="{{ current }}" bindchange="sgmChange">
+          width="{{ wx.WIN_WIDTH-130 }}" bindchange="sgmChange">
             <ui-tab>
                   <view class="">展教联盟</view>
             </ui-tab>
@@ -16,7 +16,7 @@
                     <view class="">科普大学</view>
             </ui-tab>
             <ui-tab>
-                    <view class="">全部</view>
+                    <view class=""></view>
             </ui-tab>
            
           </ui-tabs>
@@ -25,30 +25,59 @@
     </ui-nav-bar>
 
     <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
-    <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}"></view>
+    <view style="width:{{wx.WIN_WIDTH}}px; height:{{NAV_HEIGHT}}px"></view>
     <!-- <cover-image src={{floatButtonImgSrcArray[0]}} style="width:100rpx;height:100rpx;"/> -->
 
+    <!-- 搜索框 -->
+    <view class='page_row' wx:if="{{!flag}}">  
+      <view class="search" bindtap="handleSearchBarTap">  
+        <view class="df search_arr">  
+          <icon class="searchcion" size='20' type='search'></icon>  
+          <input bindinput="handleSearchInput" placeholder="请输入关键字" focus="{{focus}}"/>  
+        </view>  
+      </view>  
+      <view class='search_button' bindtap="handleSearchButtonTap">搜索</view>  
+    </view>
+    <!-- 搜索结果popup -->
+    <ui-popup show="{{ show }}" position="bottom" top="200">
+      <view style="padding: 16rpx;">
+          <button bindtap="handlePopupShow" plain type="primary">关闭</button>
+      </view>
+    <scroll-view scroll-y style="height: 100%;">
+      <view class="search_cards" id="{{index}}" bindtap="switchToSearchDetails" wx:for="{{resultList}}" wx:key="key" hover-class="touchui-hover">
+          <ui-row>
+            <ui-col align="left" vertical-align="middle" space="20">
+              <view style="width: 100%;">
+                <ui-row height="30">
+                  <ui-col class="name" align="left" vertical-align="middle" style="font-size:36rpx; font-weight:bold;">
+                    <text >{{item.result.name}}</text>
+                  </ui-col>
+                </ui-row>
+                <text class="introduction">{{item.result.introduction}}</text>
+              </view>
+            </ui-col>
+          </ui-row>
+        </view>
+    </scroll-view>
+    </ui-popup>
     <!-- 场馆卡片 / 场馆地图 / 切换按钮 -->
     <view class="container">
       <view wx:if="{{!flag}}">
-        <view class="sites_cards" id="{{item.id}}" bindtap="switchToSiteDetails" wx:for="{{pois}}" wx:key="key" height="80" border-bottom hover-class="touchui-hover">
+        <view class="sites_cards" id="{{item.id}}" bindtap="switchToSiteDetails" wx:for="{{sitesDataArray[tabIndex]}}" wx:key="key" hover-class="touchui-hover">
           <!-- <view class="site_card"> -->
           <view class="site_card_image">
-              <image src="http://lorempixel.com/400/200" style="height:300rpx"/>
+              <image src="https://www.hongshankexie.com{{item.picture}}"/>
           </view>
 
           <ui-row>
-            <!-- <ui-col width="80" height="80" align="center" vertical-align="middle">
-              <image src={{descriptionImageSrc}} style="height:160rpx"/>
-            </ui-col> -->
-            <ui-col class="text" align="left" vertical-align="middle" space="20">
+            <ui-col align="left" vertical-align="middle" space="20">
               <view style="width: 100%;">
                 <ui-row height="30">
-                  <ui-col align="left" vertical-align="middle" style="font-size:36rpx; font-weight:bold;">
-                    <text>{{item.title}}</text>
+                  <ui-col class="name" align="left" vertical-align="middle">
+                    <text>{{item.name}}</text>
                   </ui-col>
                 </ui-row>
-                <view>地址：{{item.address}} 类别：{{item.category}}</view>
+                <text class="introduction">{{item.introduction}}</text>
               </view>
             </ui-col>
           </ui-row>
@@ -61,7 +90,7 @@
       <view wx:elif="{{flag}}">
         <!-- subkey="5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" -->
         <map id="sitesMap" bindmarkertap="switchToSiteDetails"
-          markers="{{markers}}" scale="15" 
+          markers="{{markersArray[tabIndex]}}" scale="12" polygons="{{polygons}}"
           longitude="{{currLocation.longitude}}" latitude="{{currLocation.latitude}}"
           style="width:100%;height:{{CONTAINER_HEIGHT}}px;position:fixed;left:0;top:{{NAV_HEIGHT}}px">
         </map>
@@ -69,266 +98,452 @@
           <cover-image class="floatImage" src={{floatButtonImgSrcArray[1]}} style="visibility:visible"/>
         </cover-view>
       </view>
-
-      <!-- <cover-view class="floatButton" bindtap="handleFloatButton">
-          <cover-image class="img" src={{floatButtonImgSrcArray[0]}} style="visibility:visible"/>
-      </cover-view> -->
     </view>
     
   </view>
 </template>
 
 <script>
-export default {
-  config: {
-    navigationBarTitleText: "科普场馆"
-    // backgroundColor: "#333333"
-  },
-  data: {
-    markers: [],
-    pois: [],
-    // description image src
-    descriptionImageSrc: "http://lorempixel.com/400/200",
-    currLocation: {
-      latitude: "30.5195640000",
-      longitude: "114.4020540000"
+  import boundary_points from "../../static/data/boundary_points.js";
+
+  export default {
+    // var boundary_points =require(../../static/data/city.js');
+
+    config: {
+      navigationBarTitleText: "科普场馆"
     },
-
-    //自定义tab style
-    navBarStyle: {
-      //  "background-color": "#000000",
-      // "background-color": "#292e38"
-      "background-color": "#283350"
-    },
-    inkBarStyle: {
-      "border-bottom": "6rpx solid #3d72ff",
-      width: "30%",
-      top: "-16rpx"
-    },
-    tabStyle: {
-      color: "#fff"
-      // color: "#333333",
-    },
-    DEFAULT_CONTENT_HEIGHT: wx.DEFAULT_CONTENT_HEIGHT,
-    WIN_WIDTH: wx.WIN_WIDTH,
-    WIN_HEIGHT: wx.WIN_HEIGHT,
-    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT + "px",
-    CONTAINER_HEIGHT:
-      wx.WIN_HEIGHT - (wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT),
-
-    floatButtonImgSrcArray: [
-      "../../static/images/float/map-blue.png",
-      "../../static/images/float/list-blue.png"
-    ],
-    flag: 0
-  },
-  // 选项卡切换事件函数
-  sgmChange(e) {
-    let index = e.detail.index;
-
-    let markers3 = this.data.markers0
-      .concat(this.data.markers1)
-      .concat(this.data.markers2);
-    let pois3 = this.data.pois0.concat(this.data.pois1).concat(this.data.pois2);
-    let markersArray = [
-      this.data.markers0,
-      this.data.markers1,
-      this.data.markers2,
-      markers3
-    ];
-
-    let poisArray = [this.data.pois0, this.data.pois1, this.data.pois2, pois3];
-
-    this.setData({
-      markers: markersArray[index],
-      pois: poisArray[index],
-      // descriptionImageSrc: descriptionImageSrcArray[index]
-    });
-  },
-  // 浮动按钮点击函数
-  handleFloatButton(e) {
-    if (this.data.flag) {
-      this.setData({
-        flag: 0
-      });
-    } else {
-      this.setData({
-        flag: 1
-      });
-    }
-  },
-  // 地图markers点击函数
-  switchToSiteDetails(e) {
-    let id_tapped = "";
-    if (e.hasOwnProperty("markerId")) {
-      id_tapped = e.markerId;
-      console.log("---您点击了地图标记：" + id_tapped);
-    } else {
-      id_tapped = e.currentTarget.id;
-      console.log("---您点击了列表：" + id_tapped);
-    }
-
-    // poi.id 与 markers.id 同
-    // let poisArray = [this.data.pois0, this.data.pois1, this.data.pois2];
-    let pois = this.data.pois;
-    let res = pois.filter((value, index, array) => {
-      return value.id == id_tapped;
-    });
-    let poi = res[0];
-    console.log(JSON.stringify(poi));
-    wx.navigateTo({
-      url: "/pages/siteDetails/siteDetails?poi=" + JSON.stringify(poi)
-    });
-  },
-
-  onLoad: function() {
-    var _this = this;
-
-    // 引入SDK核心类
-    var QQMapWX = require("../../static/data/qqmap-wx-jssdk.js");
-    // 实例化API核心类
-    var qqmapsdk = new QQMapWX({
-      key: "5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" // 必填
-    });
-
-    //get current location
-    wx.getLocation({
-      type: "gcj02", //返回可用于wx.openLocation的经纬度
-      success: function(res_getLocation) {
-        let currLocation = res_getLocation;
-        _this.setData({
-          currLocation: currLocation
-        });
+    data: {
+      tabIndex: 0,
+      focus: false,
+      show: false,
+      inputValue: "",
+      currLocation: {
+        latitude: "30.5195640000",
+        longitude: "114.4020540000"
       },
-      fail: function(e) {
-        console.log("---获取当前位置失败: " + e);
+
+      //自定义tab style
+      navBarStyle: {
+        "background-color": "#283350"
       },
-      complete: function() {
-        var poiTypes = ["大学", "博物馆", "会展中心"];
+      inkBarStyle: {
+        "border-bottom": "6rpx solid #3d72ff",
+        width: "30%",
+        top: "-16rpx"
+      },
+      tabStyle: {
+        "font-size": "30rpx",
+        color: "#fff"
+      },
+      NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
+      CONTAINER_HEIGHT:
+        wx.WIN_HEIGHT - (wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT),
 
-        poiTypes.forEach((poiType, index) => {
-          getPois(poiType, index);
-        });
-      }
-    });
-
-    function getPois(poiType, index) {
-      // var result = [];
-      qqmapsdk.reverseGeocoder({
-        location: _this.data.currLocation,
-        get_poi: 1, //是否返回周边POI列表：1.返回；0不返回(默认),非必须参数
-        poi_options:
-          "category=" + poiType + ";page_size=20;page_index=1;radius=5000",
-
-        success: function(res_reverseGeocoder) {
-          var pois = res_reverseGeocoder.result.pois;
-          // result.push(pois);
-          console.log("---获取poi成功：" + pois);
-
-          let mks = [];
-          // 当get_poi为1时，检索当前位置或者location周边poi数据并在地图显示，可根据需求是否使用
-          for (var i = 0; i < pois.length; i++) {
-            mks.push({
-              title: pois[i].title,
-              id: pois[i].id,
-              latitude: pois[i].location.lat,
-              longitude: pois[i].location.lng,
-              iconPath: "../../static/images/marker/marker-40.png",
-              width: 30,
-              height: 30,
-              callout:{
-                content:pois[i].title,
-                fontSize:10,
-                color:"#ffffff",
-                bgColor:"#000000",
-                padding:2,
-                borderRadius:4,
-                // boxShadow:"4px 8px 16px 0 rgba(0)",
-                display:"ALWAYS"
-              }
+      floatButtonImgSrcArray: [
+        "../../static/images/float/map-blue.png",
+        "../../static/images/float/list-blue.png"
+      ],
+      flag: 0
+    },
+    // 选项卡切换事件函数
+    sgmChange(e) {
+      let tabIndex = e.detail.index;
+      this.setData({
+        tabIndex: tabIndex
+      });
+    },
+    // 搜索框点击函数
+    handleSearchBarTap: function() {
+      this.setData({
+        focus: true
+      });
+    },
+    //搜索框输入函数
+    handleSearchInput(e) {
+      this.setData({
+        inputValue: e.detail.value
+      });
+    },
+    // 搜索按钮点击函数
+    handleSearchButtonTap: function() {
+      let _this = this;
+      let keyword = this.data.inputValue;
+      let app = getApp();
+      app.myPost({
+        _url: "/getlist/search",
+        _data: { value: keyword },
+        _success: function(data) {
+          if (data.success && data.resultList.length > 0) {
+            _this.setData({
+              resultList: data.resultList,
+              show: true
+            });
+          } else {
+            wx.showToast({
+              title: "没有搜索到相关数据"
             });
           }
-          // result.push(mks);
-          switch (index) {
-            case 0:
-              _this.setData({
-                markers0: mks,
-                pois0: pois,
-                // 设置默认的markers pois
-                markers: mks,
-                pois: pois
-              });
-              break;
-            case 1:
-              _this.setData({
-                markers1: mks,
-                pois1: pois
-              });
-              break;
-            case 2:
-              _this.setData({
-                markers2: mks,
-                pois2: pois
-              });
-              break;
-            default:
-              break;
-          }
-        },
-        fail: function(error) {
-          console.error("---获取poi失败：" + error);
         }
       });
+    },
+    handlePopupShow() {
+      this.setData({
+        show: false
+      });
+    },
+    switchToSearchDetails(e) {
+      // console.log(e);
+      let index = e.currentTarget.id;
+      let result_tapped = this.data.resultList[index];
+      let navigateUrl = "";
+      switch (result_tapped.type) {
+        case 0:
+          navigateUrl =
+            "/pages/siteDetails/siteDetails?siteData=" +
+            JSON.stringify(result_tapped.result) +
+            "&tabIndex=0";
+          break;
+        case 1:
+          navigateUrl =
+            "/pages/siteDetails/siteDetails?siteData=" +
+            JSON.stringify(result_tapped.result) +
+            "&tabIndex=1";
+        case 2:
+          "/pages/exhibitionHallDetails/exhibitionHallDetails?hallData=" +
+            JSON.stringify(result_tapped.result) +
+            "&tabIndex=2";
+
+        default:
+          break;
+      }
+
+      wx.navigateTo({
+        url: navigateUrl
+      });
+    },
+
+    // 浮动按钮点击函数
+    handleFloatButton(e) {
+      if (this.data.flag) {
+        this.setData({
+          flag: 0
+        });
+      } else {
+        this.setData({
+          flag: 1
+        });
+      }
+    },
+    // 地图markers点击函数
+    switchToSiteDetails(e) {
+      let id_tapped = "";
+      if (e.hasOwnProperty("markerId")) {
+        id_tapped = e.markerId;
+        console.log("---您点击了地图标记：" + id_tapped);
+      } else {
+        id_tapped = e.currentTarget.id;
+        console.log("---您点击了列表：" + id_tapped);
+      }
+
+      let sitesData = this.data.sitesDataArray[this.data.tabIndex];
+      let res = sitesData.filter((value, index, array) => {
+        return value.id == id_tapped;
+      });
+      let siteData = res[0];
+      console.log(
+        "--传入第2级页面的siteData,其id为: " + JSON.stringify(siteData.id)
+      );
+      wx.navigateTo({
+        url:
+          "/pages/siteDetails/siteDetails?siteData=" +
+          JSON.stringify(siteData) +
+          "&tabIndex=" +
+          this.data.tabIndex
+      });
+    },
+
+    onLoad: function() {
+      this.setData({
+        polygons: [
+          {
+            points: boundary_points,
+            strokeWidth: 1.3,
+            strokeColor: "#3d72ff",
+            fillColor: "#5080ff33"
+          }
+        ]
+      });
+
+      var app = getApp();
+      var _this = this;
+
+      // 引入SDK核心类
+      var QQMapWX = require("../../static/data/qqmap-wx-jssdk.js");
+      // 实例化API核心类
+      var qqmapsdk = new QQMapWX({
+        key: "5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" // 必填
+      });
+
+      //get current location
+      wx.getLocation({
+        type: "gcj02", //返回可用于wx.openLocation的经纬度
+        success: function(res_getLocation) {
+          let currLocation = res_getLocation;
+          _this.setData({
+            currLocation: currLocation
+          });
+        },
+        fail: function(e) {
+          console.log("---获取当前位置失败: " + e);
+        },
+        complete: function() {
+          getAllianceList();
+          getMuseumList();
+          getStationList();
+        }
+      });
+
+      function getAllianceList() {
+        app.myGet({
+          _url: "/getlist/alliance",
+          _success: function(data) {
+            let allianceList = data.allianceList;
+
+            let mks = [];
+            for (var i = 0; i < allianceList.length; i++) {
+              mks.push({
+                title: allianceList[i].name,
+                id: allianceList[i].id,
+                latitude: allianceList[i].latitude,
+                longitude: allianceList[i].longitude,
+                iconPath: "../../static/images/marker/marker-40.png",
+                width: 30,
+                height: 30,
+                callout: {
+                  content: allianceList[i].name,
+                  fontSize: 10,
+                  color: "#ffffff",
+                  bgColor: "#000000",
+                  padding: 2,
+                  borderRadius: 4,
+                  // boxShadow:"4px 8px 16px 0 rgba(0)",
+                  display: "ALWAYS"
+                }
+              });
+            }
+
+            _this.setData({
+              "sitesDataArray[0]": allianceList,
+              "markersArray[0]": mks
+            });
+          },
+          _fail: "请求失败！"
+        });
+      }
+      function getMuseumList() {
+        app.myGet({
+          _url: "/getlist/museum",
+          _success: function(data) {
+            let museumList = data.museumList;
+
+            let mks = [];
+            for (var i = 0; i < museumList.length; i++) {
+              mks.push({
+                title: museumList[i].name,
+                id: museumList[i].id,
+                latitude: museumList[i].latitude,
+                longitude: museumList[i].longitude,
+                iconPath: "../../static/images/marker/marker-40.png",
+                width: 30,
+                height: 30,
+                callout: {
+                  content: museumList[i].name,
+                  fontSize: 10,
+                  color: "#ffffff",
+                  bgColor: "#000000",
+                  padding: 2,
+                  borderRadius: 4,
+                  // boxShadow:"4px 8px 16px 0 rgba(0)",
+                  display: "ALWAYS"
+                }
+              });
+            }
+
+            _this.setData({
+              "sitesDataArray[1]": museumList,
+              "markersArray[1]": mks
+            });
+          }
+        });
+      }
+      function getStationList() {
+        app.myGet({
+          _url: "/getlist/station",
+          _success: function(data) {
+            let stationList = data.stationList;
+
+            let mks = [];
+            for (var i = 0; i < stationList.length; i++) {
+              mks.push({
+                title: stationList[i].name,
+                id: stationList[i].id,
+                latitude: stationList[i].latitude,
+                longitude: stationList[i].longitude,
+                iconPath: "../../static/images/marker/marker-40.png",
+                width: 30,
+                height: 30,
+                callout: {
+                  content: stationList[i].name,
+                  fontSize: 10,
+                  color: "#ffffff",
+                  bgColor: "#000000",
+                  padding: 2,
+                  borderRadius: 4,
+                  // boxShadow:"4px 8px 16px 0 rgba(0)",
+                  display: "ALWAYS"
+                }
+              });
+            }
+
+            _this.setData({
+              "sitesDataArray[2]": stationList,
+              "markersArray[2]": mks
+            });
+          }
+        });
+      }
     }
-  }
-};
+  };
 </script>
 
 <style lang="less">
-Page {
-  background-color: #eee;
-}
+  Page {
+    background-color: #eee;
+  }
 
-// .container {
-//   position: fixed;
-//   left: 0;
+  .search {
+    width: 80%;
+  }
+  .search_arr {
+    border: 1px solid #d0d0d0;
+    border-radius: 10rpx;
+    margin-left: 20rpx;
+  }
+  .search_arr input {
+    margin-left: 60rpx;
+    height: 60rpx;
+    border-radius: 5px;
+  }
+  .bc_text {
+    line-height: 68rpx;
+    height: 68rpx;
+    margin-top: 34rpx;
+  }
 
-// }
+  .search_button {
+    margin-left: 15rpx;
+    width: 15%;
+    line-height: 200%;
+    text-align: center;
 
-.sites_cards {
-  // border: 2rpx solid #ffffff;
-  border-radius: 6rpx;
-  background-color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  margin: 28rpx;
-  margin-bottom: 32rpx;
-  position: relative;
-}
+    border: 1px solid #d0d0d0;
+    border-radius: 10rpx;
+  }
+  .page_row {
+    margin-top: 20rpx;
+    display: flex;
+    flex-direction: row;
+  }
+  .searchcion {
+    margin: 10rpx 10rpx 10rpx 10rpx;
+    position: absolute;
+    left: 25rpx;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+  }
+  .search_cards {
+    border-radius: 0rpx;
+    background-color: #f0f1f1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    margin: 28rpx;
+    margin-bottom: 32rpx;
+    // position: relative;
+    overflow: hidden;
 
-.floatButton {
-  position: fixed;
-  right: 80rpx;
-  bottom: 80rpx;
-  width: 110rpx;
-  height: 110rpx;
-  visibility: visible;
-  border-radius: 50%;
+    // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    .name {
+      font-size: 30rpx;
+      color: #3d72ff;
+      margin-top: 10rpx;
+    }
+    .introduction {
+      // height: 100px;
+      font-size: 26rpx;
+      // margin-bottom: 10rpx;
+      // display: -webkit-box;
+      // overflow: hidden;
+      // text-overflow: ellipsis;
+      // word-wrap: break-word;
+      // white-space: normal !important;
+      // -webkit-line-clamp: 5;
+      // -webkit-box-orient: vertical;
+      // margin-bottom: 10rpx;
+    }
+  }
+  .sites_cards {
+    border-radius: 6rpx;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    margin: 28rpx;
+    margin-bottom: 32rpx;
+    position: relative;
+    overflow: hidden;
 
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
-  // z-index: 100;
-}
+    .site_card_image {
+      height: 280rpx;
+    }
+    .name {
+      font-size: 36rpx;
+      font-weight: bold;
+    }
+    .introduction {
+      font-size: 24rpx;
+      display: -webkit-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-wrap: break-word;
+      white-space: normal !important;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      margin-bottom: 24rpx;
+    }
+  }
+  .floatButton {
+    position: fixed;
+    right: 80rpx;
+    bottom: 80rpx;
+    width: 120rpx;
+    height: 120rpx;
+    visibility: visible;
+    border-radius: 50%;
 
-.floatImage {
-  // visibility: visible;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
-}
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+    // z-index: 100;
+  }
+
+  .floatImage {
+    // visibility: visible;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
+  }
 </style>

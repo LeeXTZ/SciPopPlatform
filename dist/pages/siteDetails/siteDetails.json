@@ -1,5 +1,0 @@
-{
-  "usingComponents": {
-    "ui-accordion": "../../packages/touchui-wx-components/ui-accordion/dist/index"
-  }
-}
