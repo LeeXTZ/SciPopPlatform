@@ -1,9 +1,21 @@
 <template>
   <view>
+     <!--导航栏-->
+    <ui-nav-bar slot="nav-bar" class="nav_bar" custom-style="{{ navBarStyle }}" style="height:{{NAV_HEIGHT*2}}rpx;">
+      <!-- <ui-row height="{{STATUS_BAR_HEIGHT}}"></ui-row> 用于占去状态栏的位置 -->
+      <ui-row height="{{DEFAULT_HEADER_HEIGHT}}">
+        <ui-col vertical-align="middle" align="center" width="{{WIN_WIDTH}}" style="font-size: 30rpx; color: #fff;">
+          我的
+        </ui-col>
+      </ui-row>
+    </ui-nav-bar>
+    <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
+    <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}px"></view>
+
     <view class="userinfo-container">
       <button class="getUserinfo-button" wx:if="{{!hasUserInfo}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 请点击登录 </button>
       <block wx:else>
-        <ui-blur height="300" url="{{ userInfo.avatarUrl }}">
+        <ui-blur height="260" url="{{ userInfo.avatarUrl }}">
           <view class="top_content">
             <view>
               <image src="{{ userInfo.avatarUrl }}" mode='aspectFill' />
@@ -38,146 +50,204 @@
 </template>
 
 <script>
-const app = getApp();
+  const app = getApp();
 
-let items = ["账号信息", "收藏", "设置", "关于"];
+  let items = ["账号信息", "收藏", "设置", "关于"];
 
-export default {
-  config: {
-    navigationBarTitleText: "我的"
-  },
-  data: {
-    // motto: 'Hello World',
-    userInfo: {},
-    hasUserInfo: false,
-    canIUse: wx.canIUse("button.open-type.getUserInfo"),
+  export default {
+    config: {
+      navigationBarTitleText: "我的"
+    },
+    data: {
+      navBarStyle: {
+        "background-color": "#283350"
+      },
+      WIN_WIDTH: wx.WIN_WIDTH,
+      STATUS_BAR_HEIGHT: wx.STATUS_BAR_HEIGHT,
+      DEFAULT_HEADER_HEIGHT: wx.DEFAULT_HEADER_HEIGHT,
+      NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
+      // motto: 'Hello World',
+      userInfo: {},
+      hasUserInfo: false,
+      canIUse: wx.canIUse("button.open-type.getUserInfo"),
 
-    // NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
-    // scrollTop: 0,
-    items: items,
-    imgHeight: parseInt(wx.WIN_WIDTH / 1125 * 628),
-    customStyle: {
-      "background-color": "#eee",
-      height: "46px",
-      "line-height": "46px"
-    }
-  },
-  // onPageScroll(e) {
-  //   this.setData({
-  //     scrollTop: e.scrollTop
-  //   });
-  // },
-  //事件处理函数
-  bindViewTap: function() {
-    wx.navigateTo({
-      url: "../logs/logs"
-    });
-  },
-  onLoad: function() {
-    if (app.globalData.userInfo) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
+      // NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT,
+      // scrollTop: 0,
+      items: items,
+      imgHeight: parseInt(wx.WIN_WIDTH / 1125 * 628),
+      customStyle: {
+        "background-color": "#eee",
+        height: "46px",
+        "line-height": "46px"
+      }
+    },
+    //事件处理函数
+    bindViewTap: function() {
+      wx.navigateTo({
+        url: "../logs/logs"
       });
-    } else if (this.data.canIUse) {
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
+    },
+    onLoad: function() {
+      let _this = this;
+      if (app.globalData.userInfo) {
+        wx.login({
+          success: function(res) {
+            var code = res.code;
+            if (code) {
+              console.log("获取用户登录凭证：" + code);
+              let userInfo2Post = app.globalData.userInfo;
+              userInfo2Post.code = code;
+              // 将携带有code和userInfo的userInfo2Post post到服务端
+              app.myPost({
+                _url: "/user/login",
+                _data: userInfo2Post,
+                _success: function(data) {
+                  if (data.success) {
+                    _this.setData({
+                      userInfo: app.globalData.userInfo,
+                      hasUserInfo: true
+                    });
+                  } else {
+                    wx.showToast({
+                      title: "登陆失败",
+                      icon: "none",
+                      duration: 2000
+                    });
+                  }
+                }
+              });
+            } else {
+              console.log("获取用户登录态失败：" + res.errMsg);
+            }
+          }
         });
-      };
-    } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo;
-          this.setData({
+      } else if (this.data.canIUse) {
+        // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+        // 所以此处加入 callback 以防止这种情况
+        app.userInfoReadyCallback = res => {
+          _this.setData({
             userInfo: res.userInfo,
             hasUserInfo: true
           });
-        }
-      });
+        };
+      } else {
+        // 在没有 open-type=getUserInfo 版本的兼容处理
+        wx.getUserInfo({
+          success: res => {
+            app.globalData.userInfo = res.userInfo;
+            _this.setData({
+              userInfo: res.userInfo,
+              hasUserInfo: true
+            });
+          }
+        });
+      }
+    },
+    getUserInfo: function(e) {
+      //点击登陆的时候会调用，e中带有用户的公开信息
+      // console.log(e);
+      let _this = this;
+
+      if (e.detail.hasOwnProperty("userInfo")) {
+        wx.login({
+          success: function(res) {
+            var code = res.code;
+            if (code) {
+              console.log("获取用户登录凭证：" + code);
+              let userInfo2Post = e.detail.userInfo;
+              userInfo2Post.code = code;
+              // 将携带有code和userInfo的userInfo2Post post到服务端
+              app.myPost({
+                _url: "/user/login",
+                _data: userInfo2Post,
+                _success: function(data) {
+                  if (data.success) {
+                    _this.setData({
+                      userInfo: e.detail.userInfo,
+                      hasUserInfo: true
+                    });
+                  } else {
+                    wx.showToast({
+                      title: "登陆失败",
+                      icon: "none",
+                      duration: 2000
+                    });
+                  }
+                }
+              });
+            } else {
+              console.log("获取用户登录态失败：" + res.errMsg);
+            }
+          }
+        });
+      } else {
+        // app.globalData.userInfo = e.detail.userInfo;
+        this.setData({
+          userInfo: {},
+          hasUserInfo: false
+        });
+      }
     }
-  },
-  getUserInfo: function(e) {
-    console.log(e);
-    if (e.detail.hasOwnProperty("userInfo")) {
-      app.globalData.userInfo = e.detail.userInfo;
-      this.setData({
-        userInfo: e.detail.userInfo,
-        hasUserInfo: true
-      });
-    } else {
-      // app.globalData.userInfo = e.detail.userInfo;
-      this.setData({
-        userInfo: {},
-        hasUserInfo: false
-      });
-    }
-  }
-};
+  };
 </script>
 
 <style lang="less">
-.userinfo-container {
-  display: flex;
-  flex-direction: column;
-}
+  .nav_bar {
+    width: 750rpx;
+    // height: 132rpx; //height需要用到逻辑层数据，在上面html中定义
+    background-color: #283350;
+  }
 
-.getUserinfo-button{
-  display: flex;
-  flex-direction: column;
-  align-self: center;
-  width: 375rpx;
-}
+  .userinfo-container {
+    display: flex;
+    flex-direction: column;
+  }
 
-// .userinfo-avatar {
-//   width: 128rpx;
-//   height: 128rpx;
-//   margin: 20rpx;
-//   border-radius: 50%;
-// }
+  .getUserinfo-button {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    width: 375rpx;
+  }
 
-.userinfo-nickname {
-  color: #aaa;
-}
+  .userinfo-nickname {
+    color: #aaa;
+  }
 
-.userinfo-container{
-  .top_content{
-    width: 100%;
-    // height: 100%;
-    position: absolute;
-    bottom:20px;
-    view{
-      .mix-flex-center();
-      color: #fff;
-      font-size: 16px;
-      image{
-        height: 120rpx;
-        width: 120rpx;
-        border-radius: 50%;
-        border: 2px solid #fff;
-      }
-      .ui-icon{
-        margin-left: 10px;
-      }
-      &.name{
-        padding: 20px 0;
-      }
-      .ui-view{
-        display: inline-block;
-        padding: 5px;
-        border-radius: 25px;
-        border: 1px solid #fff;
-      }
-      &.card{
-        .ui-view{
-          font-size: 14px;
+  .userinfo-container {
+    .top_content {
+      width: 100%;
+      // height: 100%;
+      position: absolute;
+      bottom: 20px;
+      view {
+        .mix-flex-center();
+        color: #fff;
+        font-size: 16px;
+        image {
+          height: 120rpx;
+          width: 120rpx;
+          border-radius: 50%;
+          border: 2px solid #fff;
+        }
+        .ui-icon {
+          margin-left: 10px;
+        }
+        &.name {
+          padding: 20px 0;
+        }
+        .ui-view {
+          display: inline-block;
+          padding: 5px;
+          border-radius: 25px;
+          border: 1px solid #fff;
+        }
+        &.card {
+          .ui-view {
+            font-size: 14px;
+          }
         }
       }
     }
   }
-}
 </style>

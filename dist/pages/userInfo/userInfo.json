@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "ui-blur": "../../packages/touchui-wx-components/ui-blur/dist/index"
-  },
-  "navigationBarTitleText": "我的"
-}

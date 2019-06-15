@@ -1,26 +1,72 @@
 <template>
   <view>
-    <view style="font-size: 16px; color: #313338; text-align:center; margin:20rpx">{{news.title}}</view>
-    <image src={{news.newsImageSrc}} style="width:750rpx; height:600rpx;"/>
-    <p style="margin:20rpx">{{news.content}}</p>
+    <!--导航栏-->
+    <ui-nav-bar slot="nav-bar" class="nav_bar" custom-style="{{ navBarStyle }}" style="height:{{NAV_HEIGHT*2}}rpx;">    
+      <!-- <ui-row height="{{STATUS_BAR_HEIGHT}}"></ui-row> 用于占去状态栏的位置 -->
+      <ui-row height="{{DEFAULT_HEADER_HEIGHT}}"> 
+        <ui-col vertical-align="middle" align="center" width="40" bindtap="navigateBack">
+          <ui-icon type="arrow-left" size="16" color="#fff"></ui-icon>
+        </ui-col>
+        <ui-col vertical-align="middle" align="center" space-right="40" style="font-size: 30rpx; color: #fff;">
+          资讯详情
+        </ui-col>
+      </ui-row>
+    </ui-nav-bar>
+    <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到导航栏中-->
+    <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}px"></view>
+
+    <view style="font-size: 20px; font-weight:bold; color: #313338; text-align:center; margin:20rpx; margin-top:40rpx;">
+      {{news.title}}
+    </view>
+    <ui-row class="tag">
+      『{{news.author}}』发布于：{{news.createTime}}
+    </ui-row>
+    <image src={{news.picture}} style="width:670rpx; height:500rpx; display:block; margin:40rpx"/>
+    <text space="emsp" style="display:block; margin:40rpx; font-size:30rpx;">{{news.content}}</text>
   </view>
   
 </template>
 
 <script>
-export default {
-  config: {
-    navigationBarTitleText: '资讯详情'
-  },
-  data: {},
-  onLoad: function (options) {
-    let news = JSON.parse(options.news);
-    this.setData({
-      news: news
-    });
-  }
-}
+  export default {
+    config: {
+      navigationBarTitleText: "资讯详情"
+    },
+    data: {
+      navBarStyle: {
+        "background-color": "#283350"
+      },
+      STATUS_BAR_HEIGHT: wx.STATUS_BAR_HEIGHT,
+      DEFAULT_HEADER_HEIGHT: wx.DEFAULT_HEADER_HEIGHT,
+      NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT
+    },
+    onLoad: function(options) {
+      let news = JSON.parse(options.news);
+      news.createTime = news.createTime.split("T")[0];
+      this.setData({
+        news: news
+      });
+    },
+    navigateBack() {
+      wx.navigateBack();
+    }
+  };
 </script>
 
 <style lang="less">
+  .nav_bar {
+    width: 750rpx;
+    // height: 132rpx; //height需要用到逻辑层数据，在上面html中定义
+    background-color: #283350;
+  }
+
+  .tag {
+    color: #9c9fa4;
+
+    // font-size: 12px;
+    // height: 50px;
+    font-size: 28rpx;
+    text-align: center;
+    .mix-text-overflow();
+  }
 </style>

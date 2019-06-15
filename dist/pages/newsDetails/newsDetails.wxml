@@ -1,5 +1,0 @@
-<view>
-  <view style="font-size: 16px; color: #313338; text-align:center; margin:20rpx">{{news.title}}</view>
-  <image src="{{news.newsImageSrc}}" style="width:750rpx; height:600rpx;" />
-  <p style="margin:20rpx">{{news.content}}</p>
-</view>

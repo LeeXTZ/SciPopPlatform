@@ -1,0 +1,187 @@
+<template>
+  <view>
+     <!--导航栏-->
+    <ui-nav-bar slot="nav-bar" class="nav_bar" custom-style="{{ navBarStyle }}" style="height:{{NAV_HEIGHT*2}}rpx;">    
+      <!-- <ui-row height="{{STATUS_BAR_HEIGHT}}"></ui-row> 用于占去状态栏的位置 -->
+      <ui-row height="{{DEFAULT_HEADER_HEIGHT}}">
+        <ui-col vertical-align="middle" align="center" width="{{WIN_WIDTH}}" style="font-size: 30rpx; color: #fff;">
+          附近推荐
+        </ui-col>
+      </ui-row>
+    </ui-nav-bar>
+    <!--将页面起始点向下推移出导航栏，否则下面的内容会进入到达行栏中-->
+    <view style="width:{{WIN_WIDTH}}px; height:{{NAV_HEIGHT}}px"></view>
+
+    <view wx:for="{{recommendList}}" class="recommend_cards" id="{{index}}" bindtap="switchToRecommendDetails" wx:key="key" hover-class="touchui-hover">
+          <!-- <view class="recommend_card"> -->
+          <view class="recommend_card_image">
+              <image src="https://www.hongshankexie.com{{item.recommend.picture}}"/>
+          </view>
+
+          <ui-row>
+            <ui-col class="text" align="left" vertical-align="middle" space="20">
+              <view style="width: 100%;">
+                <ui-row height="30">
+                  <ui-col class="name" align="left" vertical-align="middle">
+                    <text>{{item.recommend.name}}</text>
+                  </ui-col>
+                  <ui-col class="tag" width="70" vertical-align="middle">
+                    <text>距此{{item.distance}}m</text>
+                  </ui-col>
+                </ui-row>
+                <text class="introduction">{{item.recommend.introduction}}</text>
+              </view>
+            </ui-col>
+          </ui-row>
+        </view>
+  </view>
+</template>
+
+<script>
+  export default {
+    data: {
+      navBarStyle: {
+        "background-color": "#283350"
+      },
+      WIN_WIDTH: wx.WIN_WIDTH,
+      STATUS_BAR_HEIGHT: wx.STATUS_BAR_HEIGHT,
+      DEFAULT_HEADER_HEIGHT: wx.DEFAULT_HEADER_HEIGHT,
+      NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT
+    },
+    onLoad: function() {
+      let _this = this;
+      let app = getApp();
+
+      // 引入SDK核心类
+      var QQMapWX = require("../../static/data/qqmap-wx-jssdk.js");
+      // 实例化API核心类
+      var qqmapsdk = new QQMapWX({
+        key: "5F4BZ-LUMLI-VKBGL-5EK4N-4FVDE-75BC4" // 必填
+      });
+
+      let longitude = app.globalData.currLocation.longitude;
+      let latitude = app.globalData.currLocation.latitude;
+      app.myPost({
+        _url:
+          "/getlist/recommend?longitude=" + longitude + "&latitude=" + latitude,
+        _success: function(data) {
+          // 获取各个目的地经纬度数组
+          let destinationArray = [];
+          data.recommendList.forEach(element => {
+            destinationArray.push({
+              latitude: element.recommend.latitude,
+              longitude: element.recommend.longitude
+            });
+          });
+          //调用距离计算接口
+          qqmapsdk.calculateDistance({
+            //mode: 'driving',//可选值：'driving'（驾车）、'walking'（步行），不填默认：'walking',可不填
+            //from参数不填默认当前地址
+            //获取表单提交的经纬度并设置from和to参数（示例为string格式）
+            from: {
+              latitude: latitude,
+              longitude: longitude
+            },
+            to: destinationArray, //终点坐标
+            success: function(res) {
+              //成功后的回调
+              console.log(res);
+              var res = res.result;
+              var dis = [];
+              for (var i = 0; i < res.elements.length; i++) {
+                // dis.push(res.elements[i].distance); //将返回数据存入dis数组，
+                data.recommendList[i].distance = res.elements[i].distance; //直接将距离数据写入推荐列表中
+              }
+              _this.setData({
+                recommendList: data.recommendList
+              });
+            },
+            fail: function(error) {
+              console.error(error);
+            },
+            complete: function(res) {
+              console.log(res);
+            }
+          });
+
+          // _this.setData({
+          //   recommendList: data.recommendList
+          // });
+        }
+      });
+    },
+    switchToRecommendDetails(e) {
+      // console.log(e);
+      let index = e.currentTarget.id;
+      let recommend_tapped = this.data.recommendList[index];
+      let navigateUrl = "";
+      switch (recommend_tapped.type) {
+        case 0:
+          navigateUrl =
+            "/pages/siteDetails/siteDetails?siteData=" +
+            JSON.stringify(recommend_tapped.recommend) +
+            "&tabIndex=0";
+          break;
+        case 1:
+          navigateUrl =
+            "/pages/siteDetails/siteDetails?siteData=" +
+            JSON.stringify(recommend_tapped.recommend) +
+            "&tabIndex=1";
+        case 2:
+          "/pages/exhibitionHallDetails/exhibitionHallDetails?hallData=" +
+            JSON.stringify(recommend_tapped.recommend) +
+            "&tabIndex=2";
+
+        default:
+          break;
+      }
+
+      wx.navigateTo({
+        url: navigateUrl
+      });
+    }
+  };
+</script>
+
+<style lang="less">
+  .nav_bar {
+    width: 750rpx;
+    // height: 132rpx; //height需要用到逻辑层数据，在上面html中定义
+    background-color: #283350;
+  }
+  .recommend_cards {
+    border-radius: 20rpx;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    margin: 28rpx;
+    margin-bottom: 32rpx;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .recommend_cards {
+    .recommend_card_image {
+      height: 280rpx;
+    }
+    .name {
+      font-size: 26rpx;
+      font-weight: bold;
+    }
+    .tag {
+      color: #5d6166;
+      font-size: 24rpx;
+      text-align: center;
+    }
+    .introduction {
+      font-size: 24rpx;
+      display: -webkit-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-wrap: break-word;
+      white-space: normal !important;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      margin-bottom: 24rpx;
+    }
+  }
+</style>
